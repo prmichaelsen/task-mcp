@@ -3,8 +3,29 @@
   "version": "0.1.0",
   "description": "MCP server for autonomous task execution with ACP-style task management",
   "type": "module",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
+  "main": "dist/server.js",
+  "exports": {
+    ".": {
+      "types": "./dist/server.d.ts",
+      "import": "./dist/server.js"
+    },
+    "./factory": {
+      "types": "./dist/server-factory.d.ts",
+      "import": "./dist/server-factory.js"
+    },
+    "./client": {
+      "types": "./dist/client.d.ts",
+      "import": "./dist/client.js"
+    },
+    "./services": {
+      "types": "./dist/services/task-database.service.d.ts",
+      "import": "./dist/services/task-database.service.js"
+    },
+    "./schemas": {
+      "types": "./dist/schemas/task.d.ts",
+      "import": "./dist/schemas/task.js"
+    }
+  },
   "scripts": {
     "build": "tsc",
     "test": "jest",

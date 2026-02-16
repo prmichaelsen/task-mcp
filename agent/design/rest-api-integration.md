@@ -211,44 +211,78 @@ Response: {
 
 ### REST API Handler (agentbase.me)
 
+**Option 1: Using TaskDatabaseService (Recommended for REST API)**
 ```typescript
-// In agentbase.me/src/api/tasks/[taskId]/route.ts
-import { FirebaseClient } from 'task-mcp'
-import { NextRequest, NextResponse } from 'next/server'
+// In agentbase.me/src/routes/api/tasks/$taskId/index.tsx
+import { TaskDatabaseService } from 'task-mcp'
+import { getAuth } from '@/lib/auth/server-fn'
 
-export async function GET(
-  request: NextRequest,
-  { params }: { params: { taskId: string } }
-) {
-  try {
-    // Get authenticated user
-    const userId = await getUserIdFromRequest(request)
+export const Route = createAPIFileRoute('/api/tasks/$taskId')({
+  GET: async ({ request, params }) => {
+    try {
+      // Get authenticated user
+      const auth = await getAuth(request)
+      if (!auth) {
+        return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+          status: 401,
+          headers: { 'Content-Type': 'application/json' }
+        })
+      }
+      
+      // Use TaskDatabaseService directly (simpler for REST)
+      const task = await TaskDatabaseService.getTask(auth.uid, params.taskId)
+      
+      if (!task) {
+        return new Response(JSON.stringify({ error: 'Task not found' }), {
+          status: 404,
+          headers: { 'Content-Type': 'application/json' }
+        })
+      }
+      
+      return new Response(JSON.stringify({ task }), {
+        status: 200,
+        headers: { 'Content-Type': 'application/json' }
+      })
+    } catch (error) {
+      return new Response(JSON.stringify({
+        error: 'Internal server error',
+        message: error instanceof Error ? error.message : 'Unknown error'
+      }), {
+        status: 500,
+        headers: { 'Content-Type': 'application/json' }
+      })
+    }
+  }
+})
+```
+
+**Option 2: Using FirebaseClient (For Connection Management)**
+```typescript
+// In agentbase.me - Alternative approach with client wrapper
+import { FirebaseClient } from 'task-mcp'
+import { getAuth } from '@/lib/auth/server-fn'
+
+export const Route = createAPIFileRoute('/api/tasks/$taskId')({
+  GET: async ({ request, params }) => {
+    const auth = await getAuth(request)
+    if (!auth) {
+      return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401 })
+    }
     
-    // Create Firebase client (same as MCP tools use)
+    // Create client instance (manages connection)
     const client = new FirebaseClient({
-      userId,
+      userId: auth.uid,
       serviceAccountPath: process.env.FIREBASE_SERVICE_ACCOUNT_PATH
     })
     
-    // Use shared business logic
     const task = await client.getTask(params.taskId)
     
-    if (!task) {
-      return NextResponse.json(
-        { error: 'Task not found' },
-        { status: 404 }
-      )
-    }
-    
-    return NextResponse.json(task)
-  } catch (error) {
-    return NextResponse.json(
-      { error: error instanceof Error ? error.message : 'Internal error' },
-      { status: 500 }
-    )
+    return new Response(JSON.stringify({ task }), { status: 200 })
   }
-}
+})
 ```
+
+**Recommendation**: Use **TaskDatabaseService** directly in REST API handlers (Option 1) as it's simpler and matches agentbase.me's existing task documentation (Task 89).
 
 ### MCP Tool Handler (task-mcp)
 
