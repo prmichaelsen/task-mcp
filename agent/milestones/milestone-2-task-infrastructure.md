@@ -27,47 +27,59 @@ This milestone creates the `task-mcp` MCP server project following the [MCP Serv
    - Connection management
    - Error handling
 
-3. **Core Task Management Tools** (8 tools)
-   - `task_get_status` - Get current status
-   - `task_update_progress` - Update progress
-   - `task_pause` - Pause execution
-   - `task_resume` - Resume execution
-   - `task_create_milestone` - Create milestone
-   - `task_create_task` - Create task item
-   - `task_complete_task` - Mark task complete
-   - `task_complete_milestone` - Mark milestone complete
+3. **Firebase Client Wrapper & Core MCP Tools** (Task 88)
+   - Firebase Admin SDK client wrapper
+   - 8 core MCP tools that return instructions:
+     * `task_get_status` - Get current status
+     * `task_get_next_step` - Get next instructions
+     * `task_update_progress` - Update progress
+     * `task_complete_task_item` - Mark task complete
+     * `task_create_milestone` - Create milestone
+     * `task_create_task_item` - Create task item
+     * `task_report_completion` - Report completion
+     * `task_add_message` - Add message to thread
 
-4. **MCP Server Implementation**
+4. **MCP Server Implementation** (Task 89)
    - Server class with stdio transport
    - Server factory for multi-tenant
    - Tool registration
    - Request handling
    - Error handling
 
-5. **Testing**
-   - Unit tests for each tool
-   - E2E tests with Firestore emulator
-   - Integration tests for MCP protocol
-   - Test coverage > 80%
+5. **Build Configuration** (Task 90)
+   - esbuild for bundling
+   - Watch mode for development
+   - TypeScript declaration generation
+   - Source maps
 
-6. **Deployment Configuration**
+6. **Deployment Configuration** (Task 91)
    - Dockerfile for Cloud Run
    - Cloud Run deployment config
    - Service account setup
    - Environment variables
+   - Deployment scripts
+
+7. **Testing** (Integrated across all tasks)
+   - Unit tests for each component
+   - E2E tests with Firestore emulator
+   - Integration tests for MCP protocol
+   - Test coverage > 80%
 
 ## Success Criteria
 
-- [ ] task-mcp project builds successfully
-- [ ] All 8 core tools implemented
+- [x] task-mcp project initialized with TypeScript
+- [x] Schemas and database service implemented
+- [ ] Firebase client wrapper created
+- [ ] All 8 core MCP tools implemented
 - [ ] MCP server starts with stdio transport
 - [ ] Tools can be called via MCP protocol
 - [ ] Firebase operations work correctly
 - [ ] User isolation enforced
-- [ ] Unit tests pass (>80% coverage)
+- [x] Unit tests pass (14/14 for database service)
 - [ ] E2E tests pass
+- [ ] Build configuration complete
 - [ ] Can deploy to Cloud Run
-- [ ] Service account has minimal permissions
+- [ ] Service account configuration documented
 
 ## Key Files to Create
 
@@ -202,7 +214,19 @@ export async function handleTaskGetStatus(
 
 ---
 
-**Status**: Not Started
-**Estimated Effort**: 80 hours
+**Status**: In Progress (33% complete, 2/6 tasks done)
+**Estimated Effort**: 52 hours total (20 hours completed)
 **Priority**: High
 **Owner**: Development Team
+**Last Updated**: 2026-02-16
+
+## Task List
+
+- [x] Task 86: Task Data Model and Schemas (8 hours) - Completed
+- [x] Task 87: Task Database Service (12 hours) - Completed
+- [ ] Task 88: Firebase Client Wrapper & MCP Tools Foundation (16 hours)
+- [ ] Task 89: MCP Server Implementation (8 hours)
+- [ ] Task 90: Build Configuration (4 hours)
+- [ ] Task 91: Deployment Configuration (4 hours)
+
+**Total**: 52 hours estimated, 20 hours completed

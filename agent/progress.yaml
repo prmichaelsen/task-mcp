@@ -34,17 +34,17 @@ milestones:
   - id: M2
     name: MCP Server Foundation
     status: in_progress
-    progress: 67
+    progress: 33
     started: 2026-02-16
     completed: null
     estimated_weeks: 2
     tasks_completed: 2
-    tasks_total: 3
+    tasks_total: 6
     notes: |
       Create task-mcp server with core task management tools.
       This milestone follows the MCP Server Bootstrap Pattern.
-      Task 86 completed: Data model and schemas created.
-      Task 87 completed: Database service with 14 passing tests.
+      Task list revised to match MCP server scope (instruction-based tools).
+      Tasks 86-87 completed. Tasks 88-91 created for MCP implementation.
 
 # Tasks are granular work items within milestones
 tasks:
@@ -98,13 +98,41 @@ tasks:
         operations, progress tracking, and query methods. All 14 unit tests passing.
     
     - id: task-88
-      name: Task Execution Engine
+      name: Firebase Client Wrapper & MCP Tools Foundation
       status: not_started
-      file: agent/tasks/task-88-task-execution-engine.md
+      file: agent/tasks/task-88-firebase-client-wrapper.md
       estimated_hours: 16
       completed_date: null
       notes: |
-        Create TaskExecutor class adapted from Roo Code's Task class
+        Create Firebase client wrapper and 8 core MCP tools. Revised from
+        original TaskExecutor scope to match task-mcp's role as tool server.
+    
+    - id: task-89
+      name: MCP Server Implementation
+      status: not_started
+      file: agent/tasks/task-89-mcp-server-implementation.md
+      estimated_hours: 8
+      completed_date: null
+      notes: |
+        Create MCP server with stdio transport and server factory for multi-tenant.
+    
+    - id: task-90
+      name: Build Configuration
+      status: not_started
+      file: agent/tasks/task-90-build-configuration.md
+      estimated_hours: 4
+      completed_date: null
+      notes: |
+        Set up esbuild for bundling server and generating type declarations.
+    
+    - id: task-91
+      name: Deployment Configuration
+      status: not_started
+      file: agent/tasks/task-91-deployment-configuration.md
+      estimated_hours: 4
+      completed_date: null
+      notes: |
+        Create Dockerfile, Cloud Run config, and deployment scripts.
 
 # Documentation tracking
 documentation:
@@ -120,10 +148,24 @@ progress:
   implementation: 22
   testing: 67
   documentation: 100
-  overall: 39
+  overall: 33
 
 # Recent work log (most recent first)
 recent_work:
+  - date: 2026-02-16
+    description: |
+      Revised Milestone 2 task list to match task-mcp MCP server scope.
+      Created proper task documents (88-91) for MCP implementation.
+    items:
+      - ✅ Identified scope mismatch in original Task 88
+      - ✅ Revised Task 88: Firebase Client Wrapper & MCP Tools Foundation
+      - ✅ Created Task 89: MCP Server Implementation
+      - ✅ Created Task 90: Build Configuration
+      - ✅ Created Task 91: Deployment Configuration
+      - ✅ Updated Milestone 2 document with 6 tasks (was 3)
+      - ✅ Clarified architecture: task-mcp provides instructions, tenant executes
+      - 📋 Ready to proceed with Task 88 implementation
+  
   - date: 2026-02-16
     description: |
       Completed Task 87: Task Database Service. Created comprehensive database
@@ -167,12 +209,12 @@ recent_work:
 
 # Next steps (prioritized list)
 next_steps:
-  - Continue Milestone 2: MCP Server Foundation (67% complete)
-  - Start Task 88: Task Execution Engine (final task in M2)
-  - Create TaskExecutor class adapted from Roo Code
-  - Implement execution loop and lifecycle management
-  - Integrate with Bedrock for AI streaming
-  - Complete Milestone 2 and prepare for deployment
+  - Continue Milestone 2: MCP Server Foundation (33% complete, 2/6 tasks done)
+  - Start Task 88: Firebase Client Wrapper & MCP Tools Foundation
+  - Create Firebase client wrapper for user-scoped operations
+  - Implement 8 core MCP tools that return instructions
+  - Follow instruction-based architecture (tools guide, agent executes)
+  - Complete remaining tasks (89-91) to finish Milestone 2
 
 # General notes and observations
 notes:
