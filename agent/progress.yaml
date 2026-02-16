@@ -5,7 +5,7 @@ project:
   name: task-mcp
   version: 0.1.0
   started: 2026-02-16
-  status: not_started
+  status: in_progress
   current_milestone: M2
   description: |
     MCP server for task execution system - Port ACP-style autonomous task execution 
@@ -33,17 +33,17 @@ milestones:
   
   - id: M2
     name: MCP Server Foundation
-    status: not_started
-    progress: 0
-    started: null
+    status: in_progress
+    progress: 33
+    started: 2026-02-16
     completed: null
     estimated_weeks: 2
-    tasks_completed: 0
+    tasks_completed: 1
     tasks_total: 3
     notes: |
       Create task-mcp server with core task management tools.
       This milestone follows the MCP Server Bootstrap Pattern.
-      Dependencies: Firebase project with Firestore, Service account key, Node.js 18+
+      Task 86 completed: Data model and schemas created successfully.
 
 # Tasks are granular work items within milestones
 tasks:
@@ -78,12 +78,13 @@ tasks:
   milestone_2:
     - id: task-86
       name: Task Data Model and Schemas
-      status: not_started
+      status: completed
       file: agent/tasks/task-86-task-data-model-schemas.md
       estimated_hours: 8
-      completed_date: null
+      completed_date: 2026-02-16
       notes: |
-        Create Firestore data model, TypeScript interfaces, and Zod schemas
+        Created Firestore data model, TypeScript interfaces, and Zod schemas.
+        All schemas compile without errors and validation tests pass.
     
     - id: task-87
       name: Task Database Service
@@ -114,31 +115,45 @@ documentation:
 # Overall progress metrics
 progress:
   planning: 100
-  implementation: 0
-  testing: 0
+  implementation: 11
+  testing: 33
   documentation: 100
-  overall: 20
+  overall: 28
 
 # Recent work log (most recent first)
 recent_work:
   - date: 2026-02-16
     description: |
-      Initialized ACP context for task-mcp project. Completed comprehensive 
+      Completed Task 86: Task Data Model and Schemas. Created comprehensive
+      Zod schemas, TypeScript interfaces, Firestore security rules, and
+      collection path helpers.
+    items:
+      - ✅ Initialized Node.js project with TypeScript
+      - ✅ Created src/schemas/task.ts with complete Zod schemas
+      - ✅ Created firestore.rules with user-scoped security
+      - ✅ Created src/constant/collections.ts with path helpers
+      - ✅ Verified TypeScript compilation (no errors)
+      - ✅ Tested Zod validation with valid and invalid data
+      - ✅ All tests passed successfully
+  
+  - date: 2026-02-16
+    description: |
+      Initialized ACP context for task-mcp project. Completed comprehensive
       planning and design phase.
     items:
       - ✅ Read all agent documentation (9 files)
       - ✅ Analyzed design documents and requirements
       - ✅ Reviewed milestone and task structure
       - ✅ Created progress.yaml tracking file
-      - 📋 Ready to begin Milestone 2 implementation
+      - ✅ Enhanced code extraction guide with Roo Code paths
 
 # Next steps (prioritized list)
 next_steps:
-  - Begin Milestone 2: MCP Server Foundation
-  - Start with Task 86: Task Data Model and Schemas
-  - Set up task-mcp project structure
-  - Initialize Node.js project with TypeScript
-  - Create Firebase Admin SDK client wrapper
+  - Continue Milestone 2: MCP Server Foundation (33% complete)
+  - Start Task 87: Task Database Service
+  - Create TaskDatabaseService class with CRUD operations
+  - Implement progress tracking methods
+  - Write unit and E2E tests for database service
 
 # General notes and observations
 notes:
