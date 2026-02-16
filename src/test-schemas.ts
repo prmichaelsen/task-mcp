@@ -83,11 +83,9 @@ const validTask: Task = {
   },
   
   config: {
-    model: 'us.anthropic.claude-sonnet-4-5-20250929-v1:0',
     system_prompt: 'You are a helpful assistant',
     auto_approve: true,
-    max_iterations: 100,
-    timeout_minutes: 120
+    max_iterations: 100
   },
   
   metadata: {

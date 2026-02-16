@@ -45,7 +45,7 @@ describe('task_get_next_step', () => {
           tasks: {}
         },
         execution: { api_messages: [], task_messages: [], tool_results: [] },
-        config: { model: 'claude-3', system_prompt: '', auto_approve: true },
+        config: { system_prompt: '', auto_approve: true },
         metadata: undefined
       }
       
@@ -75,7 +75,7 @@ describe('task_get_next_step', () => {
           tasks: {}
         },
         execution: { api_messages: [], task_messages: [], tool_results: [] },
-        config: { model: 'claude-3', system_prompt: '', auto_approve: true },
+        config: { system_prompt: '', auto_approve: true },
         metadata: undefined
       }
       
@@ -119,7 +119,7 @@ describe('task_get_next_step', () => {
           }
         },
         execution: { api_messages: [], task_messages: [], tool_results: [] },
-        config: { model: 'claude-3', system_prompt: '', auto_approve: true },
+        config: { system_prompt: '', auto_approve: true },
         metadata: undefined
       }
       

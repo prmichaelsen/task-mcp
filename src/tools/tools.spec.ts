@@ -85,7 +85,7 @@ describe('MCP Tools', () => {
           }
         },
         execution: { api_messages: [], task_messages: [], tool_results: [] },
-        config: { model: 'claude-3', system_prompt: '', auto_approve: true },
+        config: { system_prompt: '', auto_approve: true },
         metadata: undefined
       }
       
@@ -153,7 +153,7 @@ describe('MCP Tools', () => {
           }
         },
         execution: { api_messages: [], task_messages: [], tool_results: [] },
-        config: { model: 'claude-3', system_prompt: '', auto_approve: true },
+        config: { system_prompt: '', auto_approve: true },
         metadata: undefined
       }
       

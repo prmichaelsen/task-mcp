@@ -74,7 +74,7 @@ describe('task_get_status', () => {
           tool_results: []
         },
         config: {
-          model: 'claude-3',
+          
           system_prompt: '',
           auto_approve: true
         },
@@ -126,7 +126,7 @@ describe('task_get_status', () => {
           tool_results: []
         },
         config: {
-          model: 'claude-3',
+          
           system_prompt: '',
           auto_approve: true
         },
@@ -193,7 +193,7 @@ describe('task_get_status', () => {
           tool_results: []
         },
         config: {
-          model: 'claude-3',
+          
           system_prompt: '',
           auto_approve: true
         },

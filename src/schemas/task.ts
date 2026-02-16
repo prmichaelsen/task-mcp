@@ -64,13 +64,12 @@ export const TaskExecutionSchema = z.object({
 /**
  * Task Configuration Schema
  * Configuration for task execution behavior
+ * Note: Model is configured globally by the tenant platform, not per-task
  */
 export const TaskConfigSchema = z.object({
-  model: z.string(),
   system_prompt: z.string(),
   auto_approve: z.boolean(),
-  max_iterations: z.number().optional(),
-  timeout_minutes: z.number().optional()
+  max_iterations: z.number().optional()
 })
 
 /**

@@ -64,11 +64,9 @@ export class TaskDatabaseService {
         tool_results: []
       },
       config: {
-        model: config?.model || 'us.anthropic.claude-sonnet-4-5-20250929-v1:0',
         system_prompt: config?.system_prompt || '',
         auto_approve: config?.auto_approve ?? true,
-        max_iterations: config?.max_iterations || 100,
-        timeout_minutes: config?.timeout_minutes || 120
+        max_iterations: config?.max_iterations || 500
       },
       metadata: metadata
     }

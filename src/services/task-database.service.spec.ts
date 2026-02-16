@@ -97,13 +97,12 @@ describe('TaskDatabaseService', () => {
         'Custom Task',
         'Custom Description',
         {
-          model: 'custom-model',
+          
           auto_approve: false,
           max_iterations: 50
         }
       )
 
-      expect(task.config.model).toBe('custom-model')
       expect(task.config.auto_approve).toBe(false)
       expect(task.config.max_iterations).toBe(50)
     })
@@ -131,7 +130,7 @@ describe('TaskDatabaseService', () => {
           tool_results: []
         },
         config: {
-          model: 'test-model',
+          
           system_prompt: 'test',
           auto_approve: true
         }
@@ -244,7 +243,7 @@ describe('TaskDatabaseService', () => {
               tool_results: []
             },
             config: {
-              model: 'test',
+              
               system_prompt: '',
               auto_approve: true
             }
@@ -386,7 +385,7 @@ describe('TaskDatabaseService', () => {
               tool_results: []
             },
             config: {
-              model: 'test',
+              
               system_prompt: '',
               auto_approve: true
             }
@@ -431,7 +430,7 @@ describe('TaskDatabaseService', () => {
               tool_results: []
             },
             config: {
-              model: 'test',
+              
               system_prompt: '',
               auto_approve: true
             }
@@ -459,7 +458,7 @@ describe('TaskDatabaseService', () => {
               tool_results: []
             },
             config: {
-              model: 'test',
+              
               system_prompt: '',
               auto_approve: true
             }
