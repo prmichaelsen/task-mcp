@@ -3,7 +3,7 @@
 
 project:
   name: task-mcp
-  version: 0.1.0
+  version: 0.2.0
   started: 2026-02-16
   status: in_progress
   current_milestone: M2
@@ -170,6 +170,38 @@ progress:
 recent_work:
   - date: 2026-02-16
     description: |
+      Implemented API Response DTOs and transformers for REST API integration.
+      Created comprehensive DTO layer to exclude internal fields from API responses.
+    items:
+      - ✅ Created src/dto/task-api.dto.ts with all DTO type definitions
+      - ✅ Defined TaskApiResponse, TaskListApiResponse, TaskMessageApiResponse
+      - ✅ Defined input DTOs (CreateTaskDto, UpdateTaskDto, etc.)
+      - ✅ Created src/dto/transformers.ts with schema-to-DTO transformation functions
+      - ✅ Implemented 9 transformer functions with proper field exclusion
+      - ✅ Excluded internal execution fields (api_messages, tool_results) from API responses
+      - ✅ Created src/dto/index.ts to export all DTOs and transformers
+      - ✅ Updated package.json with ./dto export
+      - ✅ Wrote 18 comprehensive unit tests for all transformers
+      - ✅ All 69 tests passing (14 database + 11 client + 18 tools + 8 server + 18 dto)
+      - ✅ DTO transformers have 100% code coverage
+      - 📋 Ready for Task 90: Build Configuration
+  
+  - date: 2026-02-16
+    description: |
+      Executed @acp.init command - Comprehensive agent context initialization.
+      Loaded all documentation, reviewed source code, verified current status.
+    items:
+      - ✅ Checked for ACP updates (v1.3.1, up to date)
+      - ✅ Read 9 agent documentation files (progress.yaml, design docs, milestones, tasks)
+      - ✅ Reviewed 5 key source files (schemas, services, client, server, server-factory)
+      - ✅ Verified all 51 tests passing (14 database + 11 client + 18 tools + 8 server)
+      - ✅ Confirmed Tasks 86-89 completed (4/6 milestone tasks done)
+      - ✅ Identified next steps: API DTO implementation and library exports
+      - ✅ Updated progress.yaml with initialization entry
+      - 📋 Ready to proceed with next task
+  
+  - date: 2026-02-16
+    description: |
       Completed Task 89: MCP Server Implementation.
       Created MCP server with stdio transport and mcp-auth compatible server factory.
     items:
@@ -275,12 +307,11 @@ recent_work:
 
 # Next steps (prioritized list)
 next_steps:
-  - Implement API Response DTOs (TaskApiResponse, etc.)
-  - Create DTO transformers (schema to DTO conversion)
-  - Export DTOs via package.json (./dto export)
-  - Write unit tests for DTOs and transformers
-  - Update documentation with DTO usage examples
-  - Continue with Task 90: Build Configuration (after DTOs)
+  - Continue with Task 90: Build Configuration
+  - Set up esbuild for bundling server and generating type declarations
+  - Create build and watch scripts
+  - Complete Task 91: Deployment Configuration
+  - Create Dockerfile and Cloud Run config
 
 # General notes and observations
 notes:

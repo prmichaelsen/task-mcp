@@ -1,0 +1,72 @@
+# Changelog
+
+All notable changes to this project will be documented in this file.
+
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+## [Unreleased]
+
+## [0.2.0] - 2026-02-16
+
+### Added
+- API Response DTOs for REST API integration
+  - `TaskApiResponse` - Complete task representation without internal execution fields
+  - `TaskListApiResponse` - List response with total count
+  - `TaskMessageApiResponse` - Task message representation
+  - `TaskMessageListApiResponse` - Message list response
+  - Input DTOs: `CreateTaskDto`, `UpdateTaskDto`, `CreateMessageDto`, etc.
+- DTO transformer functions for schema-to-API conversion
+  - 9 transformer functions with 100% test coverage
+  - Automatic exclusion of internal fields (api_messages, tool_results)
+- Package export for DTOs via `task-mcp/dto`
+- 18 comprehensive unit tests for DTO transformers
+
+### Changed
+- Updated package.json with `./dto` export
+
+## [0.1.0] - 2026-02-16
+
+### Added
+- Initial project setup with TypeScript and ESM
+- Task data model with Zod schemas
+  - Task, Milestone, TaskItem, TaskProgress, TaskConfig, TaskMetadata schemas
+  - Standardized timestamp fields with `_at` suffix
+- TaskDatabaseService for Firestore operations
+  - CRUD operations for tasks
+  - Task message operations
+  - Progress tracking (milestones, task items)
+  - Query methods (by status, search by title)
+- FirebaseClient wrapper for multi-tenant Firebase Admin SDK access
+- 8 core MCP tools for task management
+  - `task_get_status` - Get current task status
+  - `task_get_next_step` - Get next step instructions
+  - `task_update_progress` - Update progress percentage
+  - `task_complete_task_item` - Mark task item complete
+  - `task_create_milestone` - Create new milestone
+  - `task_create_task_item` - Create task item in milestone
+  - `task_report_completion` - Report completion and get next step
+  - `task_add_message` - Add message to task thread
+- MCP server implementation
+  - Server factory for multi-tenant usage (mcp-auth compatible)
+  - Standalone server with stdio transport
+  - Tool registration and request handling
+- Comprehensive test suite
+  - 51 unit tests (14 database + 11 client + 18 tools + 8 server)
+  - Jest configuration with ESM + TypeScript support
+  - Mocked Firebase client for testing
+- Firestore security rules with user-scoped access
+- Collection path helpers for consistent Firestore paths
+- Agent Context Protocol (ACP) documentation
+  - Design documents for architecture and requirements
+  - Milestone and task planning documents
+  - Progress tracking with progress.yaml
+
+### Security
+- User-scoped data access enforced at service layer
+- Internal execution fields excluded from API responses
+- Service account authentication for Firebase Admin SDK
+
+[Unreleased]: https://github.com/yourusername/task-mcp/compare/v0.2.0...HEAD
+[0.2.0]: https://github.com/yourusername/task-mcp/compare/v0.1.0...v0.2.0
+[0.1.0]: https://github.com/yourusername/task-mcp/releases/tag/v0.1.0
