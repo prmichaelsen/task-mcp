@@ -37,11 +37,14 @@ Implement a **Task Execution System** with **MCP Server Architecture** that:
 
 1. **Creates separate "task" conversation types** alongside regular chat conversations
 2. **Exposes task management tools via MCP server** (separate project)
-3. **Executes tasks autonomously** in the background using ACP methodology
-4. **Persists task state** in Firestore for resumability
-5. **Sends progress updates** to the task thread as work proceeds
-6. **Respects user control** via pause/resume/stop controls
-7. **Provides UI operations** via REST API (not MCP tools)
+3. **Exposes REST API endpoints** for web UI operations (dual interface)
+4. **Executes tasks autonomously** in the background using ACP methodology
+5. **Persists task state** in Firestore for resumability
+6. **Sends progress updates** to the task thread as work proceeds
+7. **Respects user control** via pause/resume/stop controls
+8. **Shares business logic** between MCP tools and REST endpoints
+
+**See Also**: [REST API Integration Design](rest-api-integration.md) for detailed REST endpoint specifications.
 
 ---
 
@@ -248,40 +251,52 @@ export async function handleTaskGetStatus(
 
 ### What Stays in agentbase.me
 
-1. **Task Data Model** (`src/schemas/task.ts`)
-   - Zod schemas for Task, Milestone, TaskItem
-   - TypeScript interfaces
-   - Shared between agentbase.me and task-mcp
+1. **REST API Routes** (for UI operations)
+   - Uses FirebaseClient from task-mcp (shared business logic)
+   - See [REST API Integration Design](rest-api-integration.md) for full endpoint list
+   - Example endpoints:
+     * `POST /api/tasks` - Create task (from UI)
+     * `GET /api/tasks` - List tasks (for UI)
+     * `GET /api/tasks/:id` - Get task details (for UI)
+     * `DELETE /api/tasks/:id` - Delete task (from UI)
+     * `GET /api/tasks/:id/messages` - Get task messages (for UI)
 
-2. **API Routes** (for UI operations only)
-   - `POST /api/tasks` - Create task (from UI)
-   - `GET /api/tasks` - List tasks (for UI)
-   - `GET /api/tasks/:id` - Get task details (for UI)
-   - `DELETE /api/tasks/:id` - Delete task (from UI)
-   - `GET /api/tasks/:id/messages` - Get task messages (for UI)
-
-3. **UI Components**
+2. **UI Components**
    - Task list view
    - Task detail view
    - Task thread view
    - Progress visualization
 
-4. **WebSocket Handler**
+3. **WebSocket Handler**
    - Stream progress updates to UI
    - Handle real-time task status changes
 
-5. **MCP Client Integration**
+4. **MCP Client Integration**
    - Connect agent to task-mcp server
    - Pass user credentials to MCP server
    - Handle MCP tool calls from agent
 
-### What Moves to task-mcp
+### What Lives in task-mcp
 
-1. **All Task Management Tools** (13 tools)
-2. **Firebase Admin SDK Integration**
-3. **Direct Firestore Operations**
-4. **Tool Execution Logic**
-5. **Progress Calculation Logic**
+1. **Shared Business Logic** (used by both MCP tools and REST API)
+   - FirebaseClient wrapper
+   - TaskDatabaseService
+   - Zod schemas and validation
+
+2. **MCP Tools** (8 core tools for agents)
+   - task_get_status, task_get_next_step, task_update_progress
+   - task_complete_task_item, task_create_milestone, task_create_task_item
+   - task_report_completion, task_add_message
+
+3. **MCP Server Implementation**
+   - Server factory for multi-tenant
+   - Stdio transport
+   - Tool registration and handling
+
+4. **REST API Support** (optional)
+   - FirebaseClient can be imported by agentbase.me
+   - Enables dual interface (MCP + REST)
+   - See [REST API Integration Design](rest-api-integration.md)
 
 ---
 
@@ -527,6 +542,8 @@ const mcpServer = createTaskMCPServer(userId, firebaseToken)
 - [MCP Server Bootstrap Pattern](https://github.com/prmichaelsen/remember-mcp/blob/main/agent/patterns/bootstrap.md)
 - [Model Context Protocol](https://modelcontextprotocol.io/)
 - [Firebase Admin SDK](https://firebase.google.com/docs/admin/setup)
+- [REST API Integration Design](rest-api-integration.md) - Dual interface architecture
+- [MCP Best Practices](https://www.philschmid.de/mcp-best-practices) - Industry best practices
 
 ---
 
