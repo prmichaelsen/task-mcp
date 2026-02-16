@@ -5,7 +5,7 @@ project:
   name: task-mcp
   version: 0.4.0
   started: 2026-02-16
-  status: in_progress
+  status: completed
   current_milestone: M2
   description: |
     MCP server for task execution system - Port ACP-style autonomous task execution 
@@ -33,18 +33,18 @@ milestones:
   
   - id: M2
     name: MCP Server Foundation
-    status: in_progress
-    progress: 86
+    status: completed
+    progress: 100
     started: 2026-02-16
-    completed: null
+    completed: 2026-02-16
     estimated_weeks: 2
     tasks_completed: 6
-    tasks_total: 7
+    tasks_total: 6
     notes: |
       Create task-mcp server with core task management tools.
       This milestone follows the MCP Server Bootstrap Pattern.
-      Task list revised to match MCP server scope (instruction-based tools).
-      Tasks 86-90, 92 completed. Task 91 remaining for deployment configuration.
+      All tasks completed. Task 91 (Deployment) moved to separate task-mcp-server project.
+      Core SDK library is complete and ready for publishing.
 
 # Tasks are granular work items within milestones
 tasks:
@@ -154,12 +154,15 @@ tasks:
     
     - id: task-91
       name: Deployment Configuration
-      status: not_started
+      status: moved
       file: agent/tasks/task-91-deployment-configuration.md
       estimated_hours: 4
-      completed_date: null
+      completed_date: 2026-02-16
       notes: |
-        Create Dockerfile, Cloud Run config, and deployment scripts.
+        MOVED to task-mcp-server project.
+        Deployment configuration belongs in separate deployment wrapper project,
+        not in the core SDK library.
+        See: /home/prmichaelsen/task-mcp-server
     
     - id: task-92
       name: REST API Client
@@ -201,6 +204,22 @@ progress:
 
 # Recent work log (most recent first)
 recent_work:
+  - date: 2026-02-16
+    description: |
+      Completed Milestone 2: MCP Server Foundation (100%).
+      Moved Task 91 (Deployment) to separate task-mcp-server project.
+      Core SDK library is complete and ready for publishing.
+    items:
+      - ✅ Milestone 2: 100% complete (6/6 tasks)
+      - ✅ Task 91 moved to task-mcp-server project
+      - ✅ Core SDK library complete
+      - ✅ Created task-mcp-server project with ACP structure
+      - ✅ Created task-mcp-server/agent/tasks/task-1-deployment-setup.md
+      - ✅ Created task-rest project with ACP structure
+      - ✅ Proper separation of concerns: SDK vs Deployment vs REST API
+      - ✅ Updated progress.yaml to mark Milestone 2 complete
+      - 📋 Ready to publish @prmichaelsen/task-mcp v0.4.0 to npm
+  
   - date: 2026-02-16
     description: |
       Completed Task 90: Build Configuration.
