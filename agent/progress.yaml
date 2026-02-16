@@ -34,16 +34,17 @@ milestones:
   - id: M2
     name: MCP Server Foundation
     status: in_progress
-    progress: 33
+    progress: 67
     started: 2026-02-16
     completed: null
     estimated_weeks: 2
-    tasks_completed: 1
+    tasks_completed: 2
     tasks_total: 3
     notes: |
       Create task-mcp server with core task management tools.
       This milestone follows the MCP Server Bootstrap Pattern.
-      Task 86 completed: Data model and schemas created successfully.
+      Task 86 completed: Data model and schemas created.
+      Task 87 completed: Database service with 14 passing tests.
 
 # Tasks are granular work items within milestones
 tasks:
@@ -88,12 +89,13 @@ tasks:
     
     - id: task-87
       name: Task Database Service
-      status: not_started
+      status: completed
       file: agent/tasks/task-87-task-database-service.md
       estimated_hours: 12
-      completed_date: null
+      completed_date: 2026-02-16
       notes: |
-        Create database service for task CRUD operations and progress tracking
+        Created comprehensive TaskDatabaseService with CRUD operations, message
+        operations, progress tracking, and query methods. All 14 unit tests passing.
     
     - id: task-88
       name: Task Execution Engine
@@ -115,13 +117,29 @@ documentation:
 # Overall progress metrics
 progress:
   planning: 100
-  implementation: 11
-  testing: 33
+  implementation: 22
+  testing: 67
   documentation: 100
-  overall: 28
+  overall: 39
 
 # Recent work log (most recent first)
 recent_work:
+  - date: 2026-02-16
+    description: |
+      Completed Task 87: Task Database Service. Created comprehensive database
+      service with CRUD operations, message handling, progress tracking, and
+      query methods. All 14 unit tests passing.
+    items:
+      - ✅ Installed Firebase Admin SDK
+      - ✅ Created TaskDatabaseService class with all CRUD methods
+      - ✅ Implemented task message operations (add, get, delete)
+      - ✅ Implemented progress tracking (milestones, task items)
+      - ✅ Added query methods (by status, search by title)
+      - ✅ Wrote 14 comprehensive unit tests with mocked Firestore
+      - ✅ Created E2E test suite for Firestore emulator
+      - ✅ Configured Jest with ESM + TypeScript support
+      - ✅ All tests passing (14/14)
+  
   - date: 2026-02-16
     description: |
       Completed Task 86: Task Data Model and Schemas. Created comprehensive
@@ -149,11 +167,12 @@ recent_work:
 
 # Next steps (prioritized list)
 next_steps:
-  - Continue Milestone 2: MCP Server Foundation (33% complete)
-  - Start Task 87: Task Database Service
-  - Create TaskDatabaseService class with CRUD operations
-  - Implement progress tracking methods
-  - Write unit and E2E tests for database service
+  - Continue Milestone 2: MCP Server Foundation (67% complete)
+  - Start Task 88: Task Execution Engine (final task in M2)
+  - Create TaskExecutor class adapted from Roo Code
+  - Implement execution loop and lifecycle management
+  - Integrate with Bedrock for AI streaming
+  - Complete Milestone 2 and prepare for deployment
 
 # General notes and observations
 notes:
