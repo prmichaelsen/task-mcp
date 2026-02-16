@@ -3,7 +3,7 @@
 
 project:
   name: task-mcp
-  version: 0.3.0
+  version: 0.4.0
   started: 2026-02-16
   status: in_progress
   current_milestone: M2
@@ -34,17 +34,17 @@ milestones:
   - id: M2
     name: MCP Server Foundation
     status: in_progress
-    progress: 71
+    progress: 86
     started: 2026-02-16
     completed: null
     estimated_weeks: 2
-    tasks_completed: 5
+    tasks_completed: 6
     tasks_total: 7
     notes: |
       Create task-mcp server with core task management tools.
       This milestone follows the MCP Server Bootstrap Pattern.
       Task list revised to match MCP server scope (instruction-based tools).
-      Tasks 86-89, 92 completed. Tasks 90-91 remaining for build and deployment.
+      Tasks 86-90, 92 completed. Task 91 remaining for deployment configuration.
 
 # Tasks are granular work items within milestones
 tasks:
@@ -134,12 +134,23 @@ tasks:
     
     - id: task-90
       name: Build Configuration
-      status: not_started
+      status: completed
       file: agent/tasks/task-90-build-configuration.md
       estimated_hours: 4
-      completed_date: null
+      completed_date: 2026-02-16
       notes: |
-        Set up esbuild for bundling server and generating type declarations.
+        Created comprehensive build configuration with esbuild.
+        
+        Completed:
+        - Created esbuild.build.js for production builds
+        - Created esbuild.watch.js for development watch mode
+        - Bundles all entry points (server, factory, client, services, schemas, dto, api-client)
+        - Generates TypeScript declarations and source maps
+        - External dependencies properly configured (firebase-admin, @modelcontextprotocol/sdk, zod)
+        - Shebang added to server.js for CLI usage
+        - Updated package.json scripts (build, build:watch, clean, dev, prepublishOnly)
+        - Build tested successfully - all bundles and declarations generated
+        - dist/ directory contains all required files
     
     - id: task-91
       name: Deployment Configuration
@@ -190,6 +201,25 @@ progress:
 
 # Recent work log (most recent first)
 recent_work:
+  - date: 2026-02-16
+    description: |
+      Completed Task 90: Build Configuration.
+      Set up esbuild for bundling and TypeScript declaration generation.
+    items:
+      - ✅ Created esbuild.build.js for production builds
+      - ✅ Created esbuild.watch.js for development watch mode
+      - ✅ Configured bundling for all entry points (7 bundles)
+      - ✅ External dependencies properly configured
+      - ✅ Generates TypeScript declarations and source maps
+      - ✅ Added shebang to server.js for CLI usage
+      - ✅ Updated package.json scripts (build, build:watch, clean, dev, prepublishOnly)
+      - ✅ Tested build successfully - all bundles generated
+      - ✅ Verified dist/ output (JS bundles, declarations, source maps)
+      - ✅ Made server.js executable
+      - ✅ Bumped version to 0.4.0
+      - ✅ Updated CHANGELOG.md with v0.4.0 release notes
+      - 📋 Ready for Task 91: Deployment Configuration
+  
   - date: 2026-02-16
     description: |
       Completed Task 92: REST API Client implementation.

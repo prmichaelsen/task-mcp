@@ -7,6 +7,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.4.0] - 2026-02-16
+
+### Added
+- Build configuration with esbuild
+  - `esbuild.build.js` - Production build script
+  - `esbuild.watch.js` - Development watch mode
+  - Bundles all entry points (server, factory, client, services, schemas, dto, api-client)
+  - Generates TypeScript declarations and source maps
+  - External dependencies properly configured
+  - Shebang added to server.js for CLI usage
+- Package scripts for building and development
+  - `npm run build` - Build all bundles and declarations
+  - `npm run build:watch` - Watch mode for development
+  - `npm run clean` - Clean dist/ directory
+  - `npm run dev` - Alias for watch mode
+  - `npm run prepublishOnly` - Pre-publish validation
+
+### Changed
+- Build process now uses esbuild instead of tsc only
+- Faster build times with bundling
+- Smaller bundle sizes with tree-shaking
+
 ## [0.3.0] - 2026-02-16
 
 ### Added
@@ -92,7 +114,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Internal execution fields excluded from API responses
 - Service account authentication for Firebase Admin SDK
 
-[Unreleased]: https://github.com/yourusername/task-mcp/compare/v0.3.0...HEAD
+[Unreleased]: https://github.com/yourusername/task-mcp/compare/v0.4.0...HEAD
+[0.4.0]: https://github.com/yourusername/task-mcp/compare/v0.3.0...v0.4.0
 [0.3.0]: https://github.com/yourusername/task-mcp/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/yourusername/task-mcp/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/yourusername/task-mcp/releases/tag/v0.1.0
