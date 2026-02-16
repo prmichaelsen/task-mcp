@@ -24,8 +24,8 @@ const validMilestone: Milestone = {
   progress: 50,
   tasks_completed: 2,
   tasks_total: 4,
-  started: '2026-02-16',
-  completed: undefined
+  started_at: '2026-02-16',
+  completed_at: undefined
 }
 
 console.log('Testing valid milestone...')
@@ -43,7 +43,7 @@ const validTaskItem: TaskItem = {
   description: 'Initialize Node.js project',
   status: 'completed',
   estimated_hours: 2,
-  completed_date: '2026-02-16',
+  completed_at: '2026-02-16',
   notes: 'Completed successfully'
 }
 

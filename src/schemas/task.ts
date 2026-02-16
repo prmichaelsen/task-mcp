@@ -19,8 +19,8 @@ export const MilestoneSchema = z.object({
   progress: z.number().min(0).max(100),
   tasks_completed: z.number().min(0),
   tasks_total: z.number().min(0),
-  started: z.string().optional(),
-  completed: z.string().optional()
+  started_at: z.string().optional(),
+  completed_at: z.string().optional()
 })
 
 /**
@@ -33,7 +33,7 @@ export const TaskItemSchema = z.object({
   description: z.string(),
   status: z.enum(['not_started', 'in_progress', 'completed']),
   estimated_hours: z.number().optional(),
-  completed_date: z.string().optional(),
+  completed_at: z.string().optional(),
   notes: z.string().optional()
 })
 

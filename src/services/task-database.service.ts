@@ -330,7 +330,7 @@ export class TaskDatabaseService {
     await this.updateMilestone(userId, taskId, milestoneId, {
       status: 'completed',
       progress: 100,
-      completed: new Date().toISOString()
+      completed_at: new Date().toISOString()
     })
   }
 
@@ -405,7 +405,7 @@ export class TaskDatabaseService {
   ): Promise<void> {
     await this.updateTaskItem(userId, taskId, milestoneId, taskItemId, {
       status: 'completed',
-      completed_date: new Date().toISOString()
+      completed_at: new Date().toISOString()
     })
   }
 
