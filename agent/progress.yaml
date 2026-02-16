@@ -34,17 +34,18 @@ milestones:
   - id: M2
     name: MCP Server Foundation
     status: in_progress
-    progress: 67
+    progress: 57
     started: 2026-02-16
     completed: null
     estimated_weeks: 2
     tasks_completed: 4
-    tasks_total: 6
+    tasks_total: 7
     notes: |
       Create task-mcp server with core task management tools.
       This milestone follows the MCP Server Bootstrap Pattern.
       Task list revised to match MCP server scope (instruction-based tools).
-      Tasks 86-89 completed. Tasks 90-91 remaining for build and deployment.
+      Tasks 86-89 completed. Tasks 90-92 remaining for build, deployment, and API client.
+      Added Task 92: REST API Client for agentbase.me integration.
 
 # Tasks are granular work items within milestones
 tasks:
@@ -149,6 +150,16 @@ tasks:
       completed_date: null
       notes: |
         Create Dockerfile, Cloud Run config, and deployment scripts.
+    
+    - id: task-92
+      name: REST API Client
+      status: not_started
+      file: agent/tasks/task-92-rest-api-client.md
+      estimated_hours: 6
+      completed_date: null
+      notes: |
+        Create REST API client for agentbase.me to consume task-mcp REST API.
+        Provides type-safe methods, authentication, error handling, and retry logic.
 
 # Documentation tracking
 documentation:
