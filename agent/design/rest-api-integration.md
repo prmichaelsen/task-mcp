@@ -1,72 +1,86 @@
 # REST API Integration Design
 
-**Concept**: Expose task-mcp business logic via REST endpoints alongside MCP tools
+**Concept**: Deploy separate REST API service alongside MCP server, both accessing same Firestore
 **Created**: 2026-02-16
+**Updated**: 2026-02-16
 **Status**: Design Specification
 
 ---
 
 ## Overview
 
-This document specifies how task-mcp exposes REST API endpoints alongside MCP tools, following industry best practices for dual-interface architecture. The REST API provides HTTP access to the same business logic used by MCP tools, enabling both AI agents (via MCP) and web UIs (via REST) to interact with the task management system.
+This document specifies the architecture for deploying TWO separate Cloud Run services that share the same codebase and Firestore database:
 
-**Core Principle**: Share business logic between MCP tools and REST endpoints. Don't duplicate code or create 1:1 mappings.
+1. **task-mcp-mcp**: MCP protocol server (for AI agents)
+2. **task-mcp-api**: REST API server (for agentbase.me UI)
+
+Both services use the same FirebaseClient, TaskDatabaseService, and schemas, but have different entry points and protocols.
+
+**Core Principle**: Separate services, shared business logic. No code duplication.
+
+**Why Separate Services**:
+- mcp-auth only supports stdio transport currently
+- Different protocols (MCP vs REST)
+- Independent scaling and deployment
+- Clear separation of concerns
 
 ---
 
 ## Architecture Pattern
 
-### Dual Interface Architecture
+### Two-Service Architecture
 
 ```
-┌─────────────────────────────────────────────────────┐
-│                  agentbase.me                       │
-│                                                     │
-│  ┌──────────────┐         ┌──────────────┐        │
-│  │   Web UI     │         │  AI Agent    │        │
-│  └──────┬───────┘         └──────┬───────┘        │
-│         │                        │                 │
-│         ▼                        ▼                 │
-│  ┌──────────────┐         ┌──────────────┐        │
-│  │  REST API    │         │  MCP Client  │        │
-│  └──────┬───────┘         └──────┬───────┘        │
-│         │                        │                 │
-│         │                        │ MCP Protocol    │
-└─────────┼────────────────────────┼─────────────────┘
-          │                        │
-          │ HTTP                   │
-          │                        ▼
-          │                 ┌──────────────┐
-          │                 │  MCP Server  │
-          │                 │  (task-mcp)  │
-          │                 └──────┬───────┘
-          │                        │
-          │                        ▼
-          │                 ┌──────────────┐
-          │                 │  MCP Tools   │
-          │                 └──────┬───────┘
+┌──────────────────────────────────────────────────────┐
+│                  agentbase.me                        │
+│                                                      │
+│  ┌──────────────┐         ┌──────────────┐         │
+│  │   Web UI     │         │  AI Agent    │         │
+│  └──────┬───────┘         └──────┬───────┘         │
+│         │                        │                  │
+│         │ HTTP REST              │ MCP Protocol     │
+└─────────┼────────────────────────┼──────────────────┘
           │                        │
           ▼                        ▼
-    ┌─────────────────────────────────┐
-    │      Shared Business Logic      │
+   ┌──────────────┐         ┌──────────────┐
+   │ task-mcp-api │         │ task-mcp-mcp │
+   │ (Cloud Run)  │         │ (Cloud Run)  │
+   │              │         │              │
+   │ Fastify      │         │ MCP SDK +    │
+   │ REST API     │         │ mcp-auth     │
+   └──────┬───────┘         └──────┬───────┘
+          │                        │
+          └────────┬───────────────┘
+                   │
+                   ▼
+    ┌──────────────────────────────────┐
+    │    Shared Business Logic         │
+    │  (same codebase, different entry)│
+    │                                  │
     │  ┌────────────────────────────┐ │
     │  │    FirebaseClient          │ │
     │  │    TaskDatabaseService     │ │
+    │  │    Schemas                 │ │
+    │  │    Tool Handlers           │ │
     │  └────────────────────────────┘ │
-    └─────────────────────────────────┘
+    └──────────────────────────────────┘
                    │
                    ▼
             ┌──────────────┐
             │   Firestore  │
+            │ (Single DB)  │
             └──────────────┘
 ```
 
 ### Key Design Decisions
 
-1. **Shared Business Logic**: Both MCP tools and REST endpoints use the same `FirebaseClient` and `TaskDatabaseService`
-2. **Separate Concerns**: MCP tools designed for agent workflows, REST endpoints designed for UI operations
-3. **User-Scoped**: All operations (MCP and REST) are scoped to `userId` for multi-tenancy
-4. **No 1:1 Mapping**: REST endpoints are NOT 1:1 mappings of MCP tools
+1. **Separate Services**: Two Cloud Run deployments (task-mcp-mcp + task-mcp-api)
+2. **Shared Codebase**: Same repo, different entry points (server.ts vs api.ts)
+3. **Shared Database**: Both services access same Firestore database
+4. **Shared Business Logic**: Both use FirebaseClient and TaskDatabaseService
+5. **Different Protocols**: MCP protocol for agents, REST for UI
+6. **User-Scoped**: All operations scoped to `userId` for multi-tenancy
+7. **No 1:1 Mapping**: REST endpoints NOT 1:1 mappings of MCP tools
 
 ---
 
@@ -214,7 +228,7 @@ Response: {
 **Option 1: Using TaskDatabaseService (Recommended for REST API)**
 ```typescript
 // In agentbase.me/src/routes/api/tasks/$taskId/index.tsx
-import { TaskDatabaseService } from 'task-mcp'
+import { TaskDatabaseService } from 'task-mcp/services'
 import { getAuth } from '@/lib/auth/server-fn'
 
 export const Route = createAPIFileRoute('/api/tasks/$taskId')({
@@ -259,7 +273,7 @@ export const Route = createAPIFileRoute('/api/tasks/$taskId')({
 **Option 2: Using FirebaseClient (For Connection Management)**
 ```typescript
 // In agentbase.me - Alternative approach with client wrapper
-import { FirebaseClient } from 'task-mcp'
+import { FirebaseClient } from 'task-mcp/client'
 import { getAuth } from '@/lib/auth/server-fn'
 
 export const Route = createAPIFileRoute('/api/tasks/$taskId')({
@@ -288,7 +302,7 @@ export const Route = createAPIFileRoute('/api/tasks/$taskId')({
 
 ```typescript
 // In task-mcp/src/tools/task-get-status.ts
-import { FirebaseClient } from '@/client.js'
+import { FirebaseClient } from '../client.js'
 
 export async function handleTaskGetStatus(
   client: FirebaseClient,
