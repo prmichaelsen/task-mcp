@@ -34,17 +34,17 @@ milestones:
   - id: M2
     name: MCP Server Foundation
     status: in_progress
-    progress: 50
+    progress: 67
     started: 2026-02-16
     completed: null
     estimated_weeks: 2
-    tasks_completed: 3
+    tasks_completed: 4
     tasks_total: 6
     notes: |
       Create task-mcp server with core task management tools.
       This milestone follows the MCP Server Bootstrap Pattern.
       Task list revised to match MCP server scope (instruction-based tools).
-      Tasks 86-88 completed. Tasks 89-91 remaining for MCP server and deployment.
+      Tasks 86-89 completed. Tasks 90-91 remaining for build and deployment.
 
 # Tasks are granular work items within milestones
 tasks:
@@ -116,12 +116,21 @@ tasks:
     
     - id: task-89
       name: MCP Server Implementation
-      status: not_started
+      status: completed
       file: agent/tasks/task-89-mcp-server-implementation.md
       estimated_hours: 8
-      completed_date: null
+      completed_date: 2026-02-16
       notes: |
-        Create MCP server with stdio transport and server factory for multi-tenant.
+        Created MCP server with stdio transport and server factory for multi-tenant.
+        
+        Completed:
+        - Installed @modelcontextprotocol/sdk
+        - Created server-factory.ts with mcp-auth compatible signature
+        - Created server.ts with stdio transport
+        - Updated package.json with bin entry
+        - Wrote comprehensive unit tests with mocked Firebase client
+        - All 51 tests passing (14 database + 11 client + 18 tools + 8 server)
+        - Server factory accepts (accessToken, userId, options) for mcp-auth compatibility
     
     - id: task-90
       name: Build Configuration
@@ -152,13 +161,30 @@ documentation:
 # Overall progress metrics
 progress:
   planning: 100
-  implementation: 50
-  testing: 75
+  implementation: 67
+  testing: 85
   documentation: 100
-  overall: 50
+  overall: 67
 
 # Recent work log (most recent first)
 recent_work:
+  - date: 2026-02-16
+    description: |
+      Completed Task 89: MCP Server Implementation.
+      Created MCP server with stdio transport and mcp-auth compatible server factory.
+    items:
+      - ✅ Installed @modelcontextprotocol/sdk (v1.26.0)
+      - ✅ Created server-factory.ts with mcp-auth compatible signature
+      - ✅ Server factory accepts (accessToken, userId, options) parameters
+      - ✅ Registers all 8 MCP tools with list_tools handler
+      - ✅ Implements call_tool handler with tool routing
+      - ✅ Created server.ts with stdio transport for standalone usage
+      - ✅ Updated package.json with bin entry for CLI
+      - ✅ Wrote comprehensive unit tests with mocked Firebase client
+      - ✅ All 51 tests passing (14 database + 11 client + 18 tools + 8 server)
+      - ✅ Server ready for mcp-auth wrapper integration
+      - 📋 Next: Task 90 - Build Configuration
+  
   - date: 2026-02-16
     description: |
       Completed Task 88: Firebase Client Wrapper & MCP Tools Foundation.
@@ -176,7 +202,6 @@ recent_work:
       - ✅ Created tools index with exports and handler registry
       - ✅ Wrote comprehensive unit tests for all tools
       - ✅ All 43 tests passing (14 database + 11 client + 18 tools)
-      - 📋 Next: Task 89 - MCP Server Implementation
   
   - date: 2026-02-16
     description: |
@@ -250,12 +275,12 @@ recent_work:
 
 # Next steps (prioritized list)
 next_steps:
-  - Continue Milestone 2: MCP Server Foundation (50% complete, 3/6 tasks done)
-  - Start Task 89: MCP Server Implementation
-  - Create MCP server with stdio transport
-  - Implement server factory for multi-tenant support
-  - Register all 8 tools with MCP server
-  - Complete remaining tasks (90-91) to finish Milestone 2
+  - Continue Milestone 2: MCP Server Foundation (67% complete, 4/6 tasks done)
+  - Start Task 90: Build Configuration
+  - Set up esbuild for bundling server
+  - Generate TypeScript declarations
+  - Complete Task 91: Deployment Configuration
+  - Finish Milestone 2 (2 tasks remaining)
 
 # General notes and observations
 notes:
