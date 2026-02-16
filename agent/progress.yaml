@@ -275,12 +275,12 @@ recent_work:
 
 # Next steps (prioritized list)
 next_steps:
-  - Continue Milestone 2: MCP Server Foundation (67% complete, 4/6 tasks done)
-  - Start Task 90: Build Configuration
-  - Set up esbuild for bundling server
-  - Generate TypeScript declarations
-  - Complete Task 91: Deployment Configuration
-  - Finish Milestone 2 (2 tasks remaining)
+  - Implement API Response DTOs (TaskApiResponse, etc.)
+  - Create DTO transformers (schema to DTO conversion)
+  - Export DTOs via package.json (./dto export)
+  - Write unit tests for DTOs and transformers
+  - Update documentation with DTO usage examples
+  - Continue with Task 90: Build Configuration (after DTOs)
 
 # General notes and observations
 notes:
