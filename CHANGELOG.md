@@ -7,6 +7,31 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.3.0] - 2026-02-16
+
+### Added
+- REST API Client for consuming task-mcp REST API
+  - `TaskApiClient` class with type-safe methods
+  - Authentication with service token
+  - Automatic retry logic with exponential backoff
+  - Comprehensive error handling with structured error classes
+  - Support for all task management operations (CRUD, status, progress)
+  - Support for milestone management (create, update, complete)
+  - Support for task item management (create, update, complete)
+  - Support for message management (get, add)
+  - Request timeout and abort controller support
+  - Optional logger for debugging
+- Error classes for API client
+  - `TaskApiError` - Base error class
+  - `TaskNotFoundError` - 404 errors
+  - `UnauthorizedError` - 401 errors
+  - `ValidationError` - 400 errors
+  - `ServerError` - 500 errors
+  - `TimeoutError` - Request timeout errors
+  - `NetworkError` - Network failure errors
+- Package export for API client via `@prmichaelsen/task-mcp/api-client`
+- 25 comprehensive unit tests for API client (91% coverage)
+
 ## [0.2.0] - 2026-02-16
 
 ### Added
@@ -67,6 +92,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Internal execution fields excluded from API responses
 - Service account authentication for Firebase Admin SDK
 
-[Unreleased]: https://github.com/yourusername/task-mcp/compare/v0.2.0...HEAD
+[Unreleased]: https://github.com/yourusername/task-mcp/compare/v0.3.0...HEAD
+[0.3.0]: https://github.com/yourusername/task-mcp/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/yourusername/task-mcp/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/yourusername/task-mcp/releases/tag/v0.1.0
