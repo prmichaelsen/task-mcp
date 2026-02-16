@@ -1,952 +1,1271 @@
-# Bootstrap Pattern: TanStack Start + Cloudflare Workers + Firebase
-
-**Complete Project Replication Guide**
-
-**Pattern Type**: Project Initialization  
-**Tech Stack**: TanStack Start, Cloudflare Workers, Vite, TypeScript, Tailwind CSS v4, Firebase, Vitest  
-**Created**: 2026-02-13  
-**Status**: Production Pattern  
-
----
+# MCP Server Bootstrap Pattern
 
 ## Overview
 
-This document provides a **comprehensive, step-by-step guide** to replicate the agentbase.me project from complete scratch. It covers the entire tech stack, build processes, configuration files, deployment setup, and architectural patterns.
-
-**Use this document to**:
-- Initialize a new TanStack Start + Cloudflare Workers project
-- Set up Firebase authentication and Firestore
-- Configure Tailwind CSS v4 with Vite
-- Implement Durable Objects for WebSocket chat
-- Set up Vitest for testing
-- Deploy to Cloudflare Workers
-
----
-
-## Table of Contents
-
-1. [Prerequisites](#prerequisites)
-2. [Project Initialization](#project-initialization)
-3. [Core Dependencies](#core-dependencies)
-4. [TypeScript Configuration](#typescript-configuration)
-5. [Vite Configuration](#vite-configuration)
-6. [Tailwind CSS v4 Setup](#tailwind-css-v4-setup)
-7. [TanStack Router Setup](#tanstack-router-setup)
-8. [Cloudflare Workers Configuration](#cloudflare-workers-configuration)
-9. [Firebase Setup](#firebase-setup)
-10. [Durable Objects Setup](#durable-objects-setup)
-11. [Testing Setup (Vitest)](#testing-setup-vitest)
-12. [Project Structure](#project-structure)
-13. [Environment Variables](#environment-variables)
-14. [Development Workflow](#development-workflow)
-15. [Deployment](#deployment)
-16. [Troubleshooting](#troubleshooting)
-
----
-
-## Prerequisites
-
-### Required Software
-
-```bash
-# Node.js 18+ (LTS recommended)
-node --version  # Should be >= 18.0.0
-
-# npm (comes with Node.js)
-npm --version
-
-# Cloudflare Wrangler CLI
-npm install -g wrangler
-wrangler --version
-
-# Git
-git --version
-```
-
-### Required Accounts
-
-- **Cloudflare Account**: For Workers deployment
-- **Firebase Project**: For authentication and Firestore
-- **Google Cloud Project**: For service accounts (optional, for advanced features)
-
----
-
-## Project Initialization
-
-### Step 1: Create Project Directory
-
-```bash
-# Create project directory
-mkdir my-project
-cd my-project
-
-# Initialize git
-git init
-
-# Initialize npm project
-npm init -y
-```
-
-### Step 2: Initialize ACP (Agent Context Protocol)
-
-```bash
-# Install ACP (Agent Context Protocol)
-curl -fsSL https://raw.githubusercontent.com/prmichaelsen/agent-context-protocol/mainline/scripts/install.sh | bash
-
-# This automatically creates:
-# - AGENT.md (ACP documentation)
-# - agent/ directory structure
-# - agent/scripts/ (check-for-updates.sh, update.sh, uninstall.sh)
-# - agent/progress.yaml (progress tracking template)
-# - All necessary .gitkeep files
-
-# Customize progress.yaml for your project
-cat > agent/progress.yaml << 'EOF'
-project:
-  name: my-project
-  version: 0.1.0
-  started: 2026-02-13
-  status: in_progress
-
-progress:
-  planning: 10%
-  implementation: 0%
-  overall: 5%
-
-recent_work:
-  - date: 2026-02-13
-    description: Project initialized
-    items:
-      - ✅ Created project structure
-      - ✅ Initialized ACP
-      - 📋 Ready to begin implementation
-
-next_steps:
-  - Install dependencies
-  - Configure TypeScript
-  - Set up Vite and TanStack Start
-
-notes: []
-current_blockers: []
-EOF
-```
-
-### Step 3: Create .gitignore
-
-```bash
-cat > .gitignore << 'EOF'
-node_modules
-.DS_Store
-dist
-dist-ssr
-*.local
-.env
-.nitro
-.tanstack
-.output
-.vinxi
-
-logs
-*.log
-EOF
-```
-
----
-
-## Core Dependencies
-
-### Step 4: Install Dependencies
-
-```bash
-# Core framework dependencies
-npm install \
-  @tanstack/react-router@^1.132.0 \
-  @tanstack/react-start@^1.132.0 \
-  @tanstack/router-plugin@^1.132.0 \
-  @tanstack/nitro-v2-vite-plugin@^1.132.31 \
-  react@^19.0.0 \
-  react-dom@^19.0.0
-
-# Vite and plugins
-npm install \
-  vite@^7.1.7 \
-  @vitejs/plugin-react@^5.0.4 \
-  vite-tsconfig-paths@^5.1.4
-
-# Cloudflare Workers
-npm install \
-  @cloudflare/vite-plugin@^1.23.1 \
-  @cloudflare/workers-types@^4.20260207.0
-
-# Tailwind CSS v4
-npm install \
-  tailwindcss@^4.0.6 \
-  @tailwindcss/vite@^4.0.6
-
-# Firebase
-npm install \
-  @prmichaelsen/firebase-admin-sdk-v8@^2.2.2 \
-  @prmichaelsen/firebase-client-v8@^1.1.2
-
-# Utilities
-npm install \
-  zod@^4.3.6 \
-  jsonwebtoken@^9.0.3 \
-  lucide-react@^0.544.0 \
-  fuse.js@^7.1.0
-
-# Chat and AI
-npm install \
-  @anthropic-ai/bedrock-sdk@^0.26.3 \
-  @anthropic-ai/sdk@^0.74.0 \
-  @modelcontextprotocol/sdk@^1.26.0 \
-  @prmichaelsen/mcp-auth@^0.2.0
-
-# Markdown rendering
-npm install \
-  react-markdown@^10.1.0 \
-  react-syntax-highlighter@^16.1.0
-
-# Dev dependencies
-npm install -D \
-  typescript@^5.7.2 \
-  @types/node@^22.10.2 \
-  @types/react@^19.0.8 \
-  @types/react-dom@^19.0.3 \
-  @types/jsonwebtoken@^9.0.10 \
-  @types/react-syntax-highlighter@^15.5.13 \
-  tsx@^4.21.0 \
-  dotenv@^17.2.4
-
-# Testing
-npm install -D \
-  vitest@^4.0.18 \
-  @vitest/ui@^4.0.18
-```
-
----
-
-## TypeScript Configuration
-
-### Step 5: Create tsconfig.json
-
-```bash
-cat > tsconfig.json << 'EOF'
-{
-  "include": ["**/*.ts", "**/*.tsx"],
-  "compilerOptions": {
-    "target": "ES2022",
-    "jsx": "react-jsx",
-    "module": "ESNext",
-    "lib": ["ES2022", "DOM", "DOM.Iterable"],
-    "types": ["vite/client"],
-
-    /* Bundler mode */
-    "moduleResolution": "bundler",
-    "allowImportingTsExtensions": true,
-    "verbatimModuleSyntax": false,
-    "noEmit": true,
-
-    /* Linting */
-    "skipLibCheck": true,
-    "strict": true,
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
-    "noFallthroughCasesInSwitch": true,
-    "noUncheckedSideEffectImports": true,
-    
-    /* Path mapping */
-    "baseUrl": ".",
-    "paths": {
-      "@/*": ["./src/*"]
-    }
-  }
-}
-EOF
-```
-
-**Key Configuration Points**:
-- `target: "ES2022"` - Modern JavaScript features
-- `moduleResolution: "bundler"` - Vite bundler mode
-- `paths: { "@/*": ["./src/*"] }` - Path aliases for clean imports
-- `strict: true` - Full TypeScript strictness
-- `noEmit: true` - Vite handles compilation
-
----
-
-## Vite Configuration
-
-### Step 6: Create vite.config.ts
-
-```bash
-cat > vite.config.ts << 'EOF'
-import { defineConfig } from 'vite'
-import { tanstackStart } from '@tanstack/react-start/plugin/vite'
-import viteReact from '@vitejs/plugin-react'
-import viteTsConfigPaths from 'vite-tsconfig-paths'
-import tailwindcss from '@tailwindcss/vite'
-import { cloudflare } from '@cloudflare/vite-plugin'
-
-const config = defineConfig({
-  plugins: [
-    // Cloudflare Workers integration
-    cloudflare({
-      viteEnvironment: { name: 'ssr' },
-    }),
-    
-    // TypeScript path resolution
-    viteTsConfigPaths({
-      projects: ['./tsconfig.json'],
-    }),
-    
-    // Tailwind CSS v4
-    tailwindcss(),
-    
-    // TanStack Start (must come after tailwindcss)
-    tanstackStart(),
-    
-    // React plugin (must come last)
-    viteReact(),
-  ],
-})
-
-export default config
-EOF
-```
-
-**Plugin Order Matters**:
-1. `cloudflare()` - Sets up Workers environment
-2. `viteTsConfigPaths()` - Resolves `@/` imports
-3. `tailwindcss()` - Processes Tailwind directives
-4. `tanstackStart()` - TanStack Start framework
-5. `viteReact()` - React JSX transformation
-
----
-
-## Tailwind CSS v4 Setup
-
-### Step 7: Create Tailwind Configuration
-
-```bash
-# Create src directory
-mkdir -p src
-
-# Create styles.css with Tailwind v4 import
-cat > src/styles.css << 'EOF'
-@import "tailwindcss";
-
-body {
-  @apply m-0;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
-    "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
-    sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
-    monospace;
-}
-EOF
-```
-
-**Tailwind CSS v4 Changes**:
-- No `tailwind.config.js` file needed
-- Use `@import "tailwindcss"` instead of `@tailwind` directives
-- Configuration via `@tailwindcss/vite` plugin
-- Faster build times with native CSS
-
----
-
-## TanStack Router Setup
-
-### Step 8: Create Router Configuration
-
-```bash
-# Create router.tsx
-cat > src/router.tsx << 'EOF'
-import { createRouter } from '@tanstack/react-router'
-
-// Import the generated route tree
-import { routeTree } from './routeTree.gen'
-
-// Create a new router instance
-export const getRouter = () => {
-  return createRouter({
-    routeTree,
-    scrollRestoration: true,
-    defaultPreloadStaleTime: 0,
-  })
-}
-EOF
-
-# Create root route
-mkdir -p src/routes
-cat > src/routes/__root.tsx << 'EOF'
-import { createRootRoute, Outlet } from '@tanstack/react-router'
-import { Meta, Scripts } from '@tanstack/react-start'
-import '../styles.css'
-
-export const Route = createRootRoute({
-  component: RootComponent,
-})
-
-function RootComponent() {
-  return (
-    <html lang="en">
-      <head>
-        <meta charSet="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>My Project</title>
-        <Meta />
-      </head>
-      <body>
-        <Outlet />
-        <Scripts />
-      </body>
-    </html>
-  )
-}
-EOF
-
-# Create index route
-cat > src/routes/index.tsx << 'EOF'
-import { createFileRoute } from '@tanstack/react-router'
-
-export const Route = createFileRoute('/')({
-  component: Home,
-})
-
-function Home() {
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 text-white flex items-center justify-center">
-      <div className="text-center">
-        <h1 className="text-6xl font-bold mb-4">Welcome</h1>
-        <p className="text-xl text-gray-300">TanStack Start + Cloudflare Workers</p>
-      </div>
-    </div>
-  )
-}
-EOF
-```
-
-**TanStack Router Patterns**:
-- File-based routing in `src/routes/`
-- `__root.tsx` - Root layout with HTML structure
-- `index.tsx` - Homepage at `/`
-- `routeTree.gen.ts` - Auto-generated by TanStack plugin
-- Use `createFileRoute()` for type-safe routes
-
----
-
-## Cloudflare Workers Configuration
-
-### Step 9: Create Server Entry Point
-
-```bash
-# Create server.ts
-cat > src/server.ts << 'EOF'
-/**
- * Custom Server Entry Point
- * 
- * Exports Durable Objects and other Cloudflare Workers-specific handlers.
- * This file is referenced by wrangler.toml as the main entry point.
- */
-
-// Export Durable Objects (if any)
-// export { ChatRoom } from './durable-objects/ChatRoom'
-
-// Re-export the default TanStack Start server entry
-export { default } from '@tanstack/react-start/server-entry'
-EOF
-```
-
-### Step 10: Create Wrangler Configuration
-
-```bash
-cat > wrangler.toml << 'EOF'
-name = "my-project"
-main = ".output/server/index.mjs"
-compatibility_date = "2025-10-16"
-compatibility_flags = ["nodejs_compat"]
-
-# Assets
-[site]
-bucket = ".output/public"
-
-# Environment variables (non-sensitive)
-[vars]
-NODE_ENV = "production"
-
-# Durable Objects (if needed)
-# [[durable_objects.bindings]]
-# name = "CHAT_ROOM"
-# class_name = "ChatRoom"
-# script_name = "my-project"
-
-# [[migrations]]
-# tag = "v1"
-# new_classes = ["ChatRoom"]
-
-# KV Namespaces (if needed)
-# [[kv_namespaces]]
-# binding = "MY_KV"
-# id = "your-kv-namespace-id"
-
-# R2 Buckets (if needed)
-# [[r2_buckets]]
-# binding = "MY_BUCKET"
-# bucket_name = "my-bucket"
-EOF
-```
-
-### Step 11: Generate Worker Types
-
-```bash
-# Generate Cloudflare Workers types
-npx wrangler types
-
-# This creates worker-configuration.d.ts with:
-# - Env interface with all bindings
-# - Durable Object types
-# - KV/R2 types
-```
-
----
-
-## Firebase Setup
-
-### Step 12: Create Firebase Configuration
-
-```bash
-# Create constant directory
-mkdir -p src/constant
-
-# Create appConfig.ts
-cat > src/constant/appConfig.ts << 'EOF'
-export const APP_NAME = 'myproject';
-EOF
-
-# Create collections.ts
-cat > src/constant/collections.ts << 'EOF'
-import { APP_NAME } from './appConfig';
-
-/**
- * Get the database collection prefix based on environment
- * - Development: Uses DB_PREFIX env var or defaults to 'e0.{APP_NAME}'
- * - Production: Uses base APP_NAME
- */
-const getBasePrefix = (): string => {
-  const environment = process.env.ENVIRONMENT;
-  if (environment && environment !== 'production' && environment !== 'prod') {
-    return `${environment}.${APP_NAME}`;
-  }
-
-  const isDevelopment = process.env.NODE_ENV === 'development';
-  if (isDevelopment) {
-    const customPrefix = process.env.DB_PREFIX;
-    if (customPrefix) {
-      return customPrefix;
-    }
-    return `e0.${APP_NAME}`;
-  }
-
-  return APP_NAME;
-};
-
-export const BASE = getBasePrefix();
-export const STORAGE_BASE = BASE.replace(/\./g, '_');
-
-// Collections
-export const USERS = `${BASE}.users`;
-
-/**
- * Get user-scoped collection paths
- */
-export function getUserConversations(userId: string): string {
-  return `${BASE}.users/${userId}/conversations`;
-}
-
-export function getUserConversationMessages(userId: string, conversationId: string): string {
-  return `${BASE}.users/${userId}/conversations/${conversationId}/messages`;
-}
-
-export function getUserCredentialsCollection(userId: string): string {
-  return `${BASE}.users/${userId}/credentials`;
-}
-
-export function getUserOAuthIntegrationsCollection(userId: string): string {
-  return `${BASE}.users/${userId}/oauth-integrations`;
-}
-EOF
-
-# Create firebase.json (empty for now)
-echo '{}' > firebase.json
-```
-
-**Firebase Patterns**:
-- **Environment-aware prefixes**: `e0.myproject` (dev) vs `myproject` (prod)
-- **User-scoped collections**: All user data under `users/{userId}/`
-- **No user_id fields**: User ID implicit in path
-- **Service account**: Use `@prmichaelsen/firebase-admin-sdk-v8` for server-side
-
----
-
-## Durable Objects Setup
-
-### Step 13: Create Durable Object (Optional)
-
-```bash
-# Create durable-objects directory
-mkdir -p src/durable-objects
-
-# Create example Durable Object
-cat > src/durable-objects/ChatRoom.ts << 'EOF'
-/**
- * ChatRoom Durable Object
- * 
- * Manages WebSocket connections for real-time chat.
- * Each user gets their own isolated ChatRoom instance.
- */
-
-export class ChatRoom implements DurableObject {
-  private state: DurableObjectState;
-  private sessions: Set<WebSocket>;
-
-  constructor(state: DurableObjectState, env: Env) {
-    this.state = state;
-    this.sessions = new Set();
-  }
-
-  async fetch(request: Request): Promise<Response> {
-    // Handle WebSocket upgrade
-    if (request.headers.get('Upgrade') === 'websocket') {
-      const pair = new WebSocketPair();
-      const [client, server] = Object.values(pair);
-
-      this.state.acceptWebSocket(server);
-      this.sessions.add(server);
-
-      return new Response(null, {
-        status: 101,
-        webSocket: client,
-      });
-    }
-
-    return new Response('Expected WebSocket', { status: 400 });
-  }
-
-  async webSocketMessage(ws: WebSocket, message: string | ArrayBuffer) {
-    // Handle incoming messages
-    console.log('Received message:', message);
-    
-    // Broadcast to all sessions
-    for (const session of this.sessions) {
-      try {
-        session.send(message);
-      } catch (err) {
-        this.sessions.delete(session);
-      }
-    }
-  }
-
-  async webSocketClose(ws: WebSocket, code: number, reason: string, wasClean: boolean) {
-    this.sessions.delete(ws);
-  }
-}
-EOF
-
-# Update server.ts to export Durable Object
-cat > src/server.ts << 'EOF'
-/**
- * Custom Server Entry Point
- */
-
-// Export Durable Objects
-export { ChatRoom } from './durable-objects/ChatRoom'
-
-// Re-export the default TanStack Start server entry
-export { default } from '@tanstack/react-start/server-entry'
-EOF
-
-# Update wrangler.toml to register Durable Object
-# (Uncomment the durable_objects sections in wrangler.toml)
-```
-
-**Durable Objects Patterns**:
-- One instance per user (use `idFromName(userId)`)
-- WebSocket connections for real-time features
-- Persistent storage via `this.state.storage`
-- Automatic hibernation when idle
-
----
-
-## Testing Setup (Vitest)
-
-### Step 14: Create Vitest Configuration
-
-```bash
-cat > vitest.config.ts << 'EOF'
-import { defineConfig } from 'vitest/config'
-import { resolve } from 'path'
-
-export default defineConfig({
-  test: {
-    globals: true,
-    environment: 'node',
-    include: ['src/**/*.spec.ts'],
-    coverage: {
-      provider: 'v8',
-      reporter: ['text', 'json', 'html'],
-      exclude: [
-        'node_modules/',
-        'src/**/*.spec.ts',
-        'src/**/*.d.ts',
-        'src/server.ts',
-        'src/router.tsx',
-        'src/routeTree.gen.ts',
-        'dist/',
-      ],
-    },
-  },
-  resolve: {
-    alias: {
-      '@': resolve(__dirname, './src'),
-    },
-  },
-})
-EOF
-
-# Create example test
-mkdir -p src/lib
-cat > src/lib/example.spec.ts << 'EOF'
-import { describe, it, expect } from 'vitest'
-
-describe('Example Test', () => {
-  it('should pass', () => {
-    expect(1 + 1).toBe(2)
-  })
-})
-EOF
-```
-
-**Vitest Patterns**:
-- Colocate tests with source files (`.spec.ts` extension)
-- Use `globals: true` for `describe`, `it`, `expect` without imports
-- Configure path aliases to match tsconfig.json
-- Use `@vitest/ui` for visual test runner
-
----
+This document describes the organizational patterns for bootstrapping a new MCP (Model Context Protocol) server library. The focus is on **structure and organization** rather than specific tools or technologies. This pattern is compatible with [`mcp-auth`](https://github.com/prmichaelsen/mcp-auth) multi-tenant authentication patterns.
+
+## Core Principles
+
+1. **Separation of Concerns**: Clear boundaries between server logic, business logic, and infrastructure
+2. **Multi-Tenant Ready**: Architecture supports per-user/per-tenant server instances
+3. **Type Safety**: Strong typing throughout with TypeScript
+4. **Modular Tools**: Each tool is self-contained with definition and handler
+5. **Dual Build Strategy**: Bundle for CLI, preserve modules for library usage
+6. **ESM-First**: Modern ES modules with proper `.js` extensions in imports
 
 ## Project Structure
 
-### Step 15: Complete Directory Structure
-
 ```
-my-project/
-├── AGENT.md                        # ACP documentation
-├── agent/                          # Agent directory
-│   ├── design/                     # Design documents
-│   ├── milestones/                 # Project milestones
-│   ├── patterns/                   # Architectural patterns
-│   ├── tasks/                      # Task documents
-│   ├── scripts/                    # ACP utility scripts
-│   ├── security/                   # Security audits
-│   └── progress.yaml               # Progress tracking
-│
+project-root/
 ├── src/
-│   ├── routes/                     # TanStack Router routes
-│   │   ├── __root.tsx              # Root layout
-│   │   ├── index.tsx               # Homepage
-│   │   └── api/                    # API routes
+│   ├── index.ts                    # CLI entry point (bundled)
+│   ├── server.ts                   # Server class (for standalone)
+│   ├── server-factory.ts           # Factory function (for multi-tenant)
+│   ├── client.ts                   # External API client wrapper
+│   ├── types.ts                    # Shared type definitions
 │   │
-│   ├── components/                 # React components
-│   │   ├── auth/                   # Auth components
-│   │   ├── chat/                   # Chat components
+│   ├── tools/                      # Tool definitions
+│   │   ├── index.ts                # Tool exports
+│   │   ├── tool-one.ts             # Individual tool (definition + handler)
+│   │   ├── tool-two.ts
 │   │   └── ...
 │   │
-│   ├── lib/                        # Utilities and libraries
-│   │   ├── auth/                   # Auth utilities
-│   │   ├── chat/                   # Chat utilities
+│   ├── types/                      # Type definitions (optional subdirectory)
+│   │   ├── mcp.ts                  # MCP-specific types
+│   │   ├── api.ts                  # External API types
 │   │   └── ...
 │   │
-│   ├── services/                   # Service layer (database access)
-│   │   ├── *-database.service.ts  # Database services
-│   │   └── *.service.ts            # API services
-│   │
-│   ├── schemas/                    # Zod schemas
-│   ├── types/                      # TypeScript types
-│   ├── constant/                   # Constants and config
-│   ├── durable-objects/            # Cloudflare Durable Objects
-│   │
-│   ├── router.tsx                  # Router configuration
-│   ├── server.ts                   # Server entry point
-│   ├── styles.css                  # Global styles
-│   └── routeTree.gen.ts            # Generated route tree
+│   └── utils/                      # Utilities
+│       ├── logger.ts               # Logging (stdio-safe for MCP)
+│       ├── error-serializer.ts     # Error handling
+│       └── ...
 │
-├── public/                         # Static assets
-├── scripts/                        # Build and utility scripts
-├── workers/                        # Worker scripts (if separate)
+├── agent/                          # Documentation & planning
+│   ├── patterns/                   # Architecture patterns
+│   ├── tasks/                      # Task tracking
+│   └── ...
 │
-├── .env                            # Environment variables (gitignored)
-├── .env.example                    # Example environment variables
-├── .gitignore                      # Git ignore rules
-├── firebase.json                   # Firebase configuration
-├── package.json                    # Dependencies and scripts
+├── package.json                    # Package configuration
 ├── tsconfig.json                   # TypeScript configuration
-├── vite.config.ts                  # Vite configuration
-├── vitest.config.ts                # Vitest configuration
-├── wrangler.toml                   # Cloudflare Workers config
-└── worker-configuration.d.ts       # Generated Worker types
+├── esbuild.build.js                # Build script
+├── esbuild.watch.js                # Watch mode script
+├── .gitignore
+└── README.md
 ```
 
----
+## Configuration Files
 
-## Environment Variables
+### package.json Structure
 
-### Step 16: Create .env.example
-
-```bash
-cat > .env.example << 'EOF'
-# Environment
-NODE_ENV=development
-ENVIRONMENT=e0
-DB_PREFIX=dev-yourname
-
-# Firebase Client (Public - safe to expose)
-VITE_FIREBASE_API_KEY=your-api-key
-VITE_FIREBASE_AUTH_DOMAIN=your-project.firebaseapp.com
-VITE_FIREBASE_PROJECT_ID=your-project-id
-VITE_FIREBASE_STORAGE_BUCKET=your-project.appspot.com
-VITE_FIREBASE_MESSAGING_SENDER_ID=123456789
-VITE_FIREBASE_APP_ID=1:123456789:web:abcdef
-
-# Firebase Admin (Private - server-side only)
-FIREBASE_ADMIN_SERVICE_ACCOUNT_KEY='{"type":"service_account",...}'
-
-# Firebase (for server-side, duplicates of VITE_ vars)
-FIREBASE_API_KEY=your-api-key
-FIREBASE_AUTH_DOMAIN=your-project.firebaseapp.com
-FIREBASE_PROJECT_ID=your-project-id
-FIREBASE_STORAGE_BUCKET=your-project.appspot.com
-FIREBASE_MESSAGING_SENDER_ID=123456789
-FIREBASE_APP_ID=1:123456789:web:abcdef
-
-# Admin
-OWNER_EMAILS=admin@example.com,owner@example.com
-
-# AWS Bedrock (for AI chat)
-AWS_ACCESS_KEY_ID=your-access-key
-AWS_SECRET_ACCESS_KEY=your-secret-key
-AWS_REGION=us-west-2
-BEDROCK_MODEL_ID=anthropic.claude-3-5-sonnet-20241022-v2:0
-
-# OAuth Integrations (examples)
-APP_INSTAGRAM_ID=your-instagram-app-id
-APP_INSTAGRAM_SECRET=your-instagram-app-secret
-INSTAGRAM_WEBHOOK_VERIFY_TOKEN=your-verify-token
-
-APP_EVENTBRITE_CLIENT_ID=your-eventbrite-client-id
-APP_EVENTBRITE_CLIENT_SECRET=your-eventbrite-client-secret
-EOF
-
-# Copy to .env and fill in real values
-cp .env.example .env
-```
-
-**Environment Variable Patterns**:
-- `VITE_*` - Exposed to client-side code
-- `FIREBASE_ADMIN_SERVICE_ACCOUNT_KEY` - JSON string (server-only)
-- `ENVIRONMENT` - Controls database prefix (e0, e1, production)
-- `DB_PREFIX` - Custom prefix for dev sandboxes
-
----
-
-## Development Workflow
-
-### Step 17: Configure package.json
-
-After installing dependencies in Step 4, manually edit `package.json` to add:
+For a simple MCP server:
 
 ```json
 {
-  "name": "my-project",
+  "name": "remember-mcp",
   "version": "0.1.0",
-  "private": true,
+  "description": "Multi-tenant memory system MCP server with vector search and relationships",
+  "main": "dist/server.js",
   "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/prmichaelsen/remember-mcp.git"
+  },
+  "bugs": {
+    "url": "https://github.com/prmichaelsen/remember-mcp/issues"
+  },
+  "homepage": "https://github.com/prmichaelsen/remember-mcp#readme",
   "scripts": {
-    "dev": "vite dev --port 3319 --host",
-    "build": "vite build",
-    "serve": "vite preview",
-    "deploy": "npm run build && wrangler deploy",
-    "cf-typegen": "wrangler types",
-    "test": "vitest",
-    "test:ui": "vitest --ui",
-    "test:run": "vitest run",
-    "test:coverage": "vitest run --coverage"
+    "build": "node esbuild.build.js",
+    "build:watch": "node esbuild.watch.js",
+    "clean": "rm -rf dist",
+    "dev": "tsx watch src/server.ts",
+    "start": "node dist/server.js",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:e2e": "jest --config jest.e2e.config.js",
+    "test:e2e:watch": "jest --config jest.e2e.config.js --watch",
+    "test:all": "npm test && npm run test:e2e",
+    "lint": "eslint src/**/*.ts",
+    "typecheck": "tsc --noEmit",
+    "prepublishOnly": "npm run clean && npm run build"
+  },
+  "keywords": [
+    "mcp",
+    "memory",
+    "vector-search",
+    "weaviate",
+    "firebase"
+  ],
+  "author": "Patrick Michaelsen",
+  "license": "MIT"
+}
+```
+
+For a library with multiple exports:
+
+```json
+{
+  "name": "@scope/package-name",
+  "version": "1.0.0",
+  "description": "MCP server for [purpose]",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/username/repo.git"
+  },
+  "bugs": {
+    "url": "https://github.com/username/repo/issues"
+  },
+  "homepage": "https://github.com/username/repo#readme",
+  
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./factory": {
+      "types": "./dist/server-factory.d.ts",
+      "import": "./dist/server-factory.js"
+    },
+    "./client": {
+      "types": "./dist/client.d.ts",
+      "import": "./dist/client.js"
+    },
+    "./tools": {
+      "types": "./dist/tools/index.d.ts",
+      "import": "./dist/tools/index.js"
+    },
+    "./types": {
+      "types": "./dist/types.d.ts",
+      "import": "./dist/types.js"
+    }
+  },
+  
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  
+  "scripts": {
+    "build": "npm run build:types && npm run build:bundle",
+    "build:types": "tsc --emitDeclarationOnly",
+    "build:bundle": "node esbuild.build.js",
+    "build:watch": "node esbuild.watch.js",
+    "start": "node dist/index.js",
+    "clean": "rm -rf dist",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:e2e": "jest --config jest.e2e.config.js",
+    "test:e2e:watch": "jest --config jest.e2e.config.js --watch",
+    "test:all": "npm test && npm run test:e2e",
+    "prepublishOnly": "npm run clean && npm run build"
+  },
+  
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "[domain-specific-keywords]"
+  ],
+  
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.0"
+  },
+  
+  "devDependencies": {
+    "@types/jest": "^30.0.0",
+    "@types/node": "^20.0.0",
+    "esbuild": "^0.25.0",
+    "jest": "^30.0.0",
+    "ts-jest": "^29.0.0",
+    "typescript": "^5.3.0"
+  },
+  
+  "engines": {
+    "node": ">=18.0.0"
   }
 }
 ```
 
-**Manual Edits Needed**:
-- `"name"` - Change to your project name (e.g., `"@yourorg/project-name"`)
-- `"version"` - Set initial version
-- `"repository"` - Add your git repository URL (optional)
-- `"author"` - Add your name/email (optional)
-- `"license"` - Set license (e.g., "MIT", "Apache-2.0")
+**Key Points:**
+- `"type": "module"` required for ESM
+- `repository`, `bugs`, `homepage` for GitHub integration
+- `main` points to the built entry file
+- `exports` field for libraries with multiple entry points
+- `files` array specifies what to publish to npm
+- `build:watch` script for development
+- `clean` script removes build artifacts
+- `prepublishOnly` ensures clean build before publishing
+- `test` scripts for jest (unit and e2e)
+- `author` field for attribution
+- `engines` specifies minimum Node.js version
 
-**Note**: Dependencies are already installed from Step 4, so no need to run `npm install` again.
+### tsconfig.json Structure
 
-### Step 18: Development Commands
-
-```bash
-# Start development server
-npm run dev
-# Opens at http://localhost:3319
-
-# Build for production
-npm run build
-# Output in .output/ directory
-
-# Preview production build locally
-npm run serve
-
-# Run tests
-npm run test
-
-# Run tests with UI
-npm run test:ui
-
-# Generate Cloudflare types
-npm run cf-typegen
-
-# Deploy to Cloudflare
-npm run deploy
+```json
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "Node16",
+    "moduleResolution": "Node16",
+    "lib": ["ES2022"],
+    "types": ["node"],
+    
+    "outDir": "./dist",
+    "rootDir": "./src",
+    
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true,
+    
+    "declaration": true,
+    "declarationMap": true,
+    "sourceMap": true,
+    
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["src/*"]
+    }
+  },
+  
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "dist"]
+}
 ```
 
----
+**Key Points:**
+- `Node16` module resolution for proper ESM support
+- `declaration: true` for type definitions
+- `strict: true` for type safety
+- Source maps for debugging
+- `baseUrl` and `paths` for module name mapping (`@/` → `src/`)
 
-## Deployment
+### Jest Configuration
 
-### Step 19: Deploy to Cloudflare Workers
+For projects with colocated tests (`.spec.ts` and `.e2e.ts` files alongside source code):
+
+#### jest.config.js - Unit Tests
+
+```javascript
+module.exports = {
+  preset: 'ts-jest',
+  testEnvironment: 'node',
+  roots: ['<rootDir>/src'],
+  testMatch: ['**/*.spec.ts'],
+  moduleFileExtensions: ['ts', 'js'],
+  collectCoverage: true,
+  coverageDirectory: 'coverage',
+  coverageReporters: ['text', 'lcov', 'html'],
+  collectCoverageFrom: [
+    'src/**/*.ts',
+    '!src/**/*.d.ts',
+    '!src/**/*.spec.ts',
+    '!src/**/*.e2e.ts',
+    '!src/index.ts',              // Barrel export only
+    '!src/types/**/*.ts',         // Type definitions only
+  ],
+  moduleNameMapper: {
+    '^@/(.*)$': '<rootDir>/src/$1',
+  },
+};
+```
+
+#### jest.e2e.config.js - E2E Tests
+
+```javascript
+module.exports = {
+  preset: 'ts-jest',
+  testEnvironment: 'node',
+  testMatch: ['**/*.e2e.ts'],
+  testTimeout: 30000, // 30 seconds for real API calls
+  roots: ['<rootDir>/src'],
+  collectCoverageFrom: [
+    'src/**/*.ts',
+    '!src/**/*.spec.ts',
+    '!src/**/*.e2e.ts',
+    '!src/types/**/*.ts',
+    '!src/index.ts',
+  ],
+  moduleNameMapper: {
+    '^@/(.*)$': '<rootDir>/src/$1',
+  },
+};
+```
+
+**Key Points:**
+- Separate configs for unit tests (`.spec.ts`) and e2e tests (`.e2e.ts`)
+- E2E tests have longer timeout for real API calls
+- Coverage excludes test files and type definitions
+- `moduleNameMapper` matches TypeScript path aliases
+- Tests are colocated with source files in `src/`
+
+**Package.json Scripts:**
+```json
+{
+  "scripts": {
+    "test": "jest --config jest.config.js",
+    "test:e2e": "jest --config jest.e2e.config.js",
+    "test:watch": "jest --config jest.config.js --watch",
+    "test:coverage": "jest --config jest.config.js --coverage"
+  },
+  "devDependencies": {
+    "@types/jest": "^29.0.0",
+    "jest": "^29.0.0",
+    "ts-jest": "^29.0.0"
+  }
+}
+```
+
+### esbuild.build.js Structure
+
+For a simple MCP server (single entry point):
+
+```javascript
+import * as esbuild from 'esbuild';
+import { execSync } from 'child_process';
+
+await esbuild.build({
+  entryPoints: ['src/server.ts'],
+  bundle: true,
+  platform: 'node',
+  target: 'node20',
+  format: 'esm',
+  outfile: 'dist/server.js',
+  sourcemap: true,
+  external: [
+    'weaviate-client',
+    'firebase-admin',
+    '@modelcontextprotocol/sdk'
+  ],
+  banner: {
+    js: "import { createRequire } from 'module'; const require = createRequire(import.meta.url);"
+  },
+  alias: {
+    '@': './src'
+  }
+});
+
+console.log('✓ JavaScript bundle built');
+
+// Generate TypeScript declarations
+console.log('Generating TypeScript declarations...');
+try {
+  execSync('tsc --emitDeclarationOnly --outDir dist', { stdio: 'inherit' });
+  console.log('✓ TypeScript declarations generated');
+} catch (error) {
+  console.error('✗ Failed to generate TypeScript declarations');
+  process.exit(1);
+}
+
+console.log('✓ Build complete');
+```
+
+For a library with multiple entry points:
+
+```javascript
+import * as esbuild from 'esbuild';
+import { execSync } from 'child_process';
+import { readdir } from 'fs/promises';
+import { join } from 'path';
+
+// Option 1: Find all entry points dynamically
+async function findEntryPoints(dir, base = 'src') {
+  const entries = [];
+  const files = await readdir(dir, { withFileTypes: true });
+  
+  for (const file of files) {
+    const fullPath = join(dir, file.name);
+    if (file.isDirectory()) {
+      entries.push(...await findEntryPoints(fullPath, base));
+    } else if (file.name.endsWith('.ts') && !file.name.endsWith('.d.ts')) {
+      entries.push(fullPath);
+    }
+  }
+  
+  return entries;
+}
+
+// Option 2: Explicit entry points
+const explicitEntryPoints = [
+  'src/server-factory.ts',
+  'src/client.ts',
+  'src/types.ts',
+  'src/tools/tool-one.ts',
+  'src/tools/tool-two.ts'
+];
+
+// Build CLI entry point (bundled)
+await esbuild.build({
+  entryPoints: ['src/index.ts'],
+  bundle: true,
+  outfile: 'dist/index.js',
+  platform: 'node',
+  target: 'node18',
+  format: 'esm',
+  sourcemap: true,
+  external: [
+    '@modelcontextprotocol/sdk',
+    // Add other peer dependencies
+  ],
+  banner: {
+    js: "import { createRequire } from 'module'; const require = createRequire(import.meta.url);"
+  },
+  alias: {
+    '@': './src'
+  },
+  minify: false,
+  keepNames: true
+});
+
+// Build library exports (unbundled, preserves module structure)
+await esbuild.build({
+  entryPoints: await findEntryPoints('src'), // or explicitEntryPoints
+  bundle: false,  // Key: don't bundle for library
+  outdir: 'dist',
+  outbase: 'src', // Preserve directory structure
+  platform: 'node',
+  target: 'node18',
+  format: 'esm',
+  sourcemap: true,
+  alias: {
+    '@': './src'
+  }
+});
+
+console.log('✓ JavaScript bundles built');
+
+// Generate TypeScript declarations
+console.log('Generating TypeScript declarations...');
+try {
+  execSync('tsc --emitDeclarationOnly --outDir dist', { stdio: 'inherit' });
+  console.log('✓ TypeScript declarations generated');
+} catch (error) {
+  console.error('✗ Failed to generate TypeScript declarations');
+  process.exit(1);
+}
+
+console.log('✓ Build complete');
+```
+
+**Key Points:**
+- **Simple servers**: Single bundled entry point
+- **Library exports**: Dual build strategy (bundle CLI, preserve modules)
+- `bundle: true` for standalone executable
+- `bundle: false` + `outbase: 'src'` for library exports
+- `external` array lists dependencies not to bundle (peer dependencies)
+- `banner` adds CommonJS compatibility for ESM bundles
+- `alias` enables path alias resolution (`@/` → `src/`)
+- `target` specifies Node.js version compatibility
+- Dynamic or explicit entry point discovery for libraries
+- **TypeScript declarations**: Always run `tsc --emitDeclarationOnly` after esbuild
+- **Why separate**: esbuild doesn't generate `.d.ts` files, TypeScript compiler does
+- **Build order**: 1) esbuild bundles JS, 2) tsc generates types, 3) both in dist/
+
+### esbuild.watch.js Structure
+
+```javascript
+import * as esbuild from 'esbuild';
+
+const ctx = await esbuild.context({
+  entryPoints: ['src/server.ts'],
+  bundle: true,
+  platform: 'node',
+  target: 'node20',
+  format: 'esm',
+  outfile: 'dist/server.js',
+  sourcemap: true,
+  external: [
+    'weaviate-client',
+    'firebase-admin',
+    '@modelcontextprotocol/sdk'
+  ],
+  banner: {
+    js: "import { createRequire } from 'module'; const require = createRequire(import.meta.url);"
+  },
+  alias: {
+    '@': './src'
+  }
+});
+
+await ctx.watch();
+console.log('👀 Watching for changes...');
+```
+
+**Key Points:**
+- Uses `esbuild.context()` API for watch mode
+- Same configuration as `esbuild.build.js` for consistency
+- Automatically rebuilds on file changes
+- Includes all the same options: `external`, `banner`, `alias`, etc.
+
+## Source Code Patterns
+
+### Tool Definition Pattern
+
+Each tool file exports both definition and handler:
+
+```typescript
+// src/tools/example-tool.ts
+import { ClientWrapper } from '../client.js';
+
+export const exampleTool = {
+  name: 'prefix_tool_name',
+  description: 'Clear description of what the tool does',
+  inputSchema: {
+    type: 'object',
+    properties: {
+      param1: {
+        type: 'string',
+        description: 'Parameter description'
+      },
+      param2: {
+        type: 'number',
+        description: 'Optional parameter',
+        default: 10
+      }
+    },
+    required: ['param1']
+  }
+};
+
+export async function handleExampleTool(
+  client: ClientWrapper,
+  args: any
+): Promise<string> {
+  try {
+    const result = await client.doSomething(args.param1, args.param2);
+    return JSON.stringify(result, null, 2);
+  } catch (error) {
+    throw new Error(`Failed to execute: ${error instanceof Error ? error.message : String(error)}`);
+  }
+}
+```
+
+**Key Points:**
+- Tool definition is a plain object (MCP Tool schema)
+- Handler is a separate async function
+- Handler receives client instance and args
+- Returns JSON string for MCP response
+- Proper error handling
+
+### Server Factory Pattern (Multi-Tenant)
+
+For use with `mcp-auth` or other multi-tenant wrappers:
+
+```typescript
+// src/server-factory.ts
+import { Server } from '@modelcontextprotocol/sdk/server/index.js';
+import { ClientWrapper } from './client.js';
+import {
+  CallToolRequestSchema,
+  ListToolsRequestSchema,
+  ErrorCode,
+  McpError
+} from '@modelcontextprotocol/sdk/types.js';
+
+// Import all tools
+import { toolOne, handleToolOne } from './tools/tool-one.js';
+import { toolTwo, handleToolTwo } from './tools/tool-two.js';
+
+export interface ServerOptions {
+  name?: string;
+  version?: string;
+}
+
+/**
+ * Create a server instance for a specific user/tenant
+ * 
+ * @param accessToken - User's access token for external API
+ * @param userId - User identifier
+ * @param options - Optional server configuration
+ * @returns Configured MCP Server instance
+ */
+export function createServer(
+  accessToken: string,
+  userId: string,
+  options: ServerOptions = {}
+): Server {
+  if (!accessToken) {
+    throw new Error('accessToken is required');
+  }
+  
+  if (!userId) {
+    throw new Error('userId is required');
+  }
+  
+  // Initialize client with user's credentials
+  const client = new ClientWrapper(accessToken);
+  
+  // Create MCP server
+  const server = new Server(
+    {
+      name: options.name || 'mcp-server',
+      version: options.version || '1.0.0'
+    },
+    {
+      capabilities: {
+        tools: {}
+      }
+    }
+  );
+  
+  // Register list_tools handler
+  server.setRequestHandler(ListToolsRequestSchema, async () => {
+    return {
+      tools: [
+        toolOne,
+        toolTwo,
+        // ... all tool definitions
+      ]
+    };
+  });
+  
+  // Register call_tool handler
+  server.setRequestHandler(CallToolRequestSchema, async (request) => {
+    const { name, arguments: args } = request.params;
+    
+    try {
+      let result: string;
+      
+      switch (name) {
+        case 'prefix_tool_one':
+          result = await handleToolOne(client, args);
+          break;
+        
+        case 'prefix_tool_two':
+          result = await handleToolTwo(client, args);
+          break;
+        
+        default:
+          throw new McpError(
+            ErrorCode.MethodNotFound,
+            `Unknown tool: ${name}`
+          );
+      }
+      
+      return {
+        content: [
+          {
+            type: 'text',
+            text: result
+          }
+        ]
+      };
+    } catch (error) {
+      if (error instanceof McpError) {
+        throw error;
+      }
+      
+      throw new McpError(
+        ErrorCode.InternalError,
+        `Tool execution failed: ${error instanceof Error ? error.message : String(error)}`
+      );
+    }
+  });
+  
+  return server;
+}
+```
+
+**Key Points:**
+- Factory function creates isolated server instances
+- Each instance has its own client with user credentials
+- No shared state between instances
+- Compatible with `mcp-auth` wrapping pattern
+
+### Standalone Server Pattern
+
+For direct stdio usage without multi-tenancy:
+
+```typescript
+// src/server.ts
+#!/usr/bin/env node
+
+import { Server } from '@modelcontextprotocol/sdk/server/index.js';
+import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
+import {
+  CallToolRequestSchema,
+  ListToolsRequestSchema,
+} from '@modelcontextprotocol/sdk/types.js';
+import { config } from 'dotenv';
+import { ClientWrapper } from './client.js';
+import { logger } from './utils/logger.js';
+
+// Import tools
+import { ToolOne } from './tools/tool-one.js';
+import { ToolTwo } from './tools/tool-two.js';
+
+// Load environment variables
+config();
+
+class MCPServer {
+  private server: Server;
+  private client: ClientWrapper;
+  private toolOne: ToolOne;
+  private toolTwo: ToolTwo;
+
+  constructor() {
+    // Initialize server
+    this.server = new Server(
+      {
+        name: 'mcp-server',
+        version: '1.0.0',
+      },
+      {
+        capabilities: {
+          tools: {},
+        },
+      }
+    );
+
+    // Initialize client
+    const apiKey = process.env.API_KEY;
+    if (!apiKey) {
+      throw new Error('API_KEY environment variable is required');
+    }
+    
+    this.client = new ClientWrapper(apiKey);
+    
+    // Initialize tools
+    this.toolOne = new ToolOne(this.client);
+    this.toolTwo = new ToolTwo(this.client);
+
+    this.setupHandlers();
+  }
+
+  private setupHandlers(): void {
+    // List available tools
+    this.server.setRequestHandler(ListToolsRequestSchema, async () => {
+      return {
+        tools: [
+          this.toolOne.getToolDefinition(),
+          this.toolTwo.getToolDefinition(),
+        ],
+      };
+    });
+
+    // Handle tool calls
+    this.server.setRequestHandler(CallToolRequestSchema, async (request) => {
+      const { name, arguments: args } = request.params;
+
+      try {
+        let result: any;
+        
+        switch (name) {
+          case 'prefix_tool_one':
+            result = await this.toolOne.execute(args);
+            break;
+
+          case 'prefix_tool_two':
+            result = await this.toolTwo.execute(args);
+            break;
+
+          default:
+            throw new Error(`Unknown tool: ${name}`);
+        }
+
+        return {
+          content: [
+            {
+              type: 'text',
+              text: JSON.stringify(result, null, 2),
+            },
+          ],
+        };
+      } catch (error) {
+        logger.error(`Tool execution failed for ${name}:`, error);
+        return {
+          content: [
+            {
+              type: 'text',
+              text: JSON.stringify({
+                error: error instanceof Error ? error.message : 'Unknown error',
+                tool: name
+              }, null, 2),
+            },
+          ],
+          isError: true,
+        };
+      }
+    });
+  }
+
+  async start(): Promise<void> {
+    try {
+      logger.info('Starting MCP Server...');
+
+      // Connect to external service
+      await this.client.connect();
+
+      // Start MCP server with stdio transport
+      const transport = new StdioServerTransport();
+      await this.server.connect(transport);
+
+      // Don't log to stdout/stderr when using stdio transport
+      // It interferes with MCP JSON protocol
+
+    } catch (error) {
+      process.exit(1);
+    }
+  }
+
+  async stop(): Promise<void> {
+    await this.server.close();
+  }
+}
+
+// Handle graceful shutdown
+const server = new MCPServer();
+
+process.on('SIGINT', async () => {
+  await server.stop();
+  process.exit(0);
+});
+
+process.on('SIGTERM', async () => {
+  await server.stop();
+  process.exit(0);
+});
+
+// Start the server
+server.start().catch((error) => {
+  process.exit(1);
+});
+```
+
+**Key Points:**
+- Class-based server for encapsulation
+- Environment variable configuration
+- Graceful shutdown handling
+- **Critical**: No stdout/stderr logging when using stdio transport
+- Tool instances as class properties
+
+### Client Wrapper Pattern
+
+```typescript
+// src/client.ts
+export interface ClientConfig {
+  apiKey: string;
+  baseUrl?: string;
+  timeout?: number;
+}
+
+export class ClientWrapper {
+  private config: ClientConfig;
+  private isConnected = false;
+
+  constructor(apiKey: string, options?: Partial<ClientConfig>) {
+    this.config = {
+      apiKey,
+      baseUrl: options?.baseUrl || 'https://api.example.com',
+      timeout: options?.timeout || 30000
+    };
+  }
+
+  async connect(): Promise<void> {
+    // Initialize connection, validate credentials, etc.
+    this.isConnected = true;
+  }
+
+  async doSomething(param: string): Promise<any> {
+    if (!this.isConnected) {
+      throw new Error('Client not connected');
+    }
+    
+    // Make API call
+    const response = await fetch(`${this.config.baseUrl}/endpoint`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${this.config.apiKey}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ param })
+    });
+    
+    if (!response.ok) {
+      throw new Error(`API error: ${response.statusText}`);
+    }
+    
+    return response.json();
+  }
+
+  isClientConnected(): boolean {
+    return this.isConnected;
+  }
+}
+```
+
+**Key Points:**
+- Encapsulates external API communication
+- Accepts credentials in constructor (for multi-tenant)
+- Connection state management
+- Error handling
+
+### Logger Pattern (Stdio-Safe)
+
+```typescript
+// src/utils/logger.ts
+export enum LogLevel {
+  ERROR = 0,
+  WARN = 1,
+  INFO = 2,
+  DEBUG = 3
+}
+
+class Logger {
+  // No-op logger to avoid interfering with stdio MCP transport
+  // All logging methods do nothing to prevent JSON corruption
+
+  error(message: string, ...args: any[]): void {
+    // No-op when using stdio
+    // Could write to file or use process.stderr in non-stdio mode
+  }
+
+  warn(message: string, ...args: any[]): void {
+    // No-op
+  }
+
+  info(message: string, ...args: any[]): void {
+    // No-op
+  }
+
+  debug(message: string, ...args: any[]): void {
+    // No-op
+  }
+}
+
+export const logger = new Logger();
+```
+
+**Key Points:**
+- **Critical**: No console output when using stdio transport
+- Stdio transport uses stdout/stdin for JSON-RPC
+- Any console output corrupts the protocol
+- Alternative: Write to file or use stderr carefully
+
+### Error Serializer Pattern
+
+```typescript
+// src/utils/error-serializer.ts
+export function serializeError(error: unknown): any {
+  if (error instanceof Error) {
+    return {
+      name: error.name,
+      message: error.message,
+      stack: error.stack,
+      ...(error as any) // Include any additional properties
+    };
+  }
+  
+  return {
+    message: String(error)
+  };
+}
+```
+
+## Integration with mcp-auth
+
+### Using AuthenticatedMCPServer
+
+If building a new server with tool-level auth:
+
+```typescript
+// src/index.ts
+import { AuthenticatedMCPServer } from '@prmichaelsen/mcp-auth/server';
+import { EnvAuthProvider } from '@prmichaelsen/mcp-auth/providers/env';
+import { SimpleTokenResolver } from '@prmichaelsen/mcp-auth';
+import { withAuth } from '@prmichaelsen/mcp-auth/server';
+
+const server = new AuthenticatedMCPServer({
+  name: 'my-server',
+  authProvider: new EnvAuthProvider(),
+  tokenResolver: new SimpleTokenResolver({ tokenEnvVar: 'API_TOKEN' }),
+  resourceType: 'myapi',
+  transport: { type: 'stdio' }
+});
+
+server.registerTool('get_data', withAuth(async (args, accessToken, userId) => {
+  const client = new ClientWrapper(accessToken);
+  return client.getData(args);
+}));
+
+await server.start();
+```
+
+### Using Server Wrapping Pattern
+
+If wrapping an existing server factory:
+
+```typescript
+// Wrapper server using mcp-auth
+import { wrapServer } from '@prmichaelsen/mcp-auth/wrapper';
+import { createServer } from './server-factory.js';
+
+const wrappedServer = wrapServer({
+  serverFactory: createServer,
+  authProvider: new JWTAuthProvider({ secret: process.env.JWT_SECRET }),
+  tokenResolver: new APITokenResolver({ apiUrl: process.env.API_URL }),
+  resourceType: 'myapi',
+  transport: { type: 'sse', port: 3000 }
+});
+
+await wrappedServer.start();
+```
+
+## Directory Organization Best Practices
+
+### Agent Directory
+
+The `agent/` directory contains documentation and planning:
+
+```
+agent/
+├── patterns/                    # Architecture patterns
+│   ├── bootstrap.md             # This document
+│   ├── library-services.md      # Service layer patterns
+│   └── ...
+│
+├── tasks/                       # Task tracking
+│   ├── task-001.md
+│   └── ...
+│
+├── milestones/                  # Milestone planning
+│   ├── milestone-1.md
+│   └── ...
+│
+├── progress.yaml                # Progress tracking
+└── requirements.md              # Requirements document
+```
+
+### Types Organization
+
+Types can be organized in two ways:
+
+**Option 1: Flat structure** (simple projects)
+```
+src/
+├── types.ts                     # All types in one file
+└── ...
+```
+
+**Option 2: Types directory** (complex projects)
+```
+src/
+├── types/
+│   ├── mcp.ts                   # MCP-specific types
+│   ├── api.ts                   # External API types
+│   ├── domain.ts                # Domain types
+│   └── index.ts                 # Re-exports
+└── ...
+```
+
+### Utils Organization
+
+```
+src/
+├── utils/
+│   ├── logger.ts                # Logging utility
+│   ├── error-serializer.ts      # Error handling
+│   ├── validation.ts            # Input validation
+│   └── index.ts                 # Re-exports
+└── ...
+```
+
+## Build Output Structure
+
+After building, the output should mirror the source structure:
+
+```
+dist/
+├── index.js                     # Bundled CLI entry
+├── index.d.ts
+├── server-factory.js            # Unbundled library exports
+├── server-factory.d.ts
+├── client.js
+├── client.d.ts
+├── types.js
+├── types.d.ts
+├── tools/
+│   ├── tool-one.js
+│   ├── tool-one.d.ts
+│   ├── tool-two.js
+│   ├── tool-two.d.ts
+│   └── index.js
+└── utils/
+    ├── logger.js
+    ├── logger.d.ts
+    └── ...
+```
+
+**Key Points:**
+- `index.js` is bundled (single file)
+- Other exports preserve module structure
+- Type definitions (`.d.ts`) for all modules
+- Source maps (`.js.map`) for debugging
+
+## Import Patterns
+
+### ESM Import Extensions
+
+Always include `.js` extension in imports (even for `.ts` files):
+
+```typescript
+// ✅ Correct
+import { ClientWrapper } from './client.js';
+import { toolOne } from './tools/tool-one.js';
+
+// ❌ Wrong
+import { ClientWrapper } from './client';
+import { toolOne } from './tools/tool-one';
+```
+
+### Re-export Patterns
+
+```typescript
+// src/tools/index.ts
+export * from './tool-one.js';
+export * from './tool-two.js';
+
+// Usage
+import { toolOne, toolTwo } from './tools/index.js';
+```
+
+## Environment Configuration
+
+### .env.example
 
 ```bash
-# 1. Login to Cloudflare
-wrangler login
+# API Configuration
+API_KEY=your_api_key_here
+API_URL=https://api.example.com
 
-# 2. Create secrets (one-time setup)
-wrangler secret put FIREBASE_ADMIN_SERVICE_ACCOUNT_KEY
-# Paste the JSON service account key
+# Server Configuration
+PORT=3000
+NODE_ENV=development
 
-wrangler secret put AWS_SECRET_ACCESS_KEY
-# Paste the AWS secret key
+# Logging
+LOG_LEVEL=info
+```
 
-# 3. Build the project
-npm run build
+### Environment Loading
 
-# 4. Deploy
-wrangler deploy
+```typescript
+import { config } from 'dotenv';
 
-# 5. View deployment
-wrangler tail
+// Load at server startup
+config();
+
+// Access variables
+const apiKey = process.env.API_KEY;
+if (!apiKey) {
+  throw new Error('API_KEY is required');
+}
+```
+
+## Testing Considerations
+
+While not covered in detail, consider:
+
+```
+src/
+├── tools/
+│   ├── tool-one.ts
+│   ├── tool-one.test.ts         # Co-located tests
+│   └── ...
+```
+
+Or separate test directory:
+
+```
+tests/
+├── tools/
+│   ├── tool-one.test.ts
+│   └── ...
+└── integration/
+    └── ...
+```
+
+## Common Patterns Summary
+
+### 1. Tool Organization
+- One file per tool
+- Export definition and handler separately
+- Handler receives client and args
+- Return JSON strings
+
+### 2. Server Patterns
+- **Factory**: For multi-tenant (returns Server instance)
+- **Class**: For standalone (manages lifecycle)
+- Both patterns supported
+
+### 3. Build Strategy
+- **Bundle**: CLI entry point (single file)
+- **Preserve**: Library exports (module structure)
+- TypeScript declarations always generated
+
+### 4. Client Pattern
+- Wrapper class for external API
+- Accept credentials in constructor
+- Stateful connection management
+
+### 5. Logging Pattern
+- No-op for stdio transport
+- File or stderr for other transports
+- Never use console.log with stdio
+
+### 6. Type Safety
+- Strong typing throughout
+- Separate type files or directories
+- Export types for library consumers
+
+### 7. Error Handling
+- Serialize errors for MCP responses
+- Proper error types (McpError)
+- Graceful degradation
+
+## Compatibility Checklist
+
+When building a server compatible with `mcp-auth`:
+
+- ✅ Export a factory function that accepts `(accessToken, userId, options?)`
+- ✅ Factory returns a configured `Server` instance
+- ✅ No shared state between server instances
+- ✅ Client wrapper accepts credentials in constructor
+- ✅ Tools are stateless (receive client as parameter)
+- ✅ Proper TypeScript types exported
+- ✅ ESM with `.js` extensions in imports
+- ✅ Dual build: bundled CLI + preserved modules
+
+## Migration Path
+
+### From Standalone to Multi-Tenant
+
+1. Extract server creation into factory function
+2. Move credential loading from env to factory parameters
+3. Ensure no shared state between instances
+4. Add factory export to package.json
+5. Update build to preserve module structure
+
+### From Multi-Tenant to mcp-auth Integration
+
+1. Keep existing factory function
+2. Add mcp-auth wrapper in separate entry point
+3. Configure auth provider and token resolver
+4. Deploy wrapped server for remote access
+5. Keep factory for direct usage
+
+## Conclusion
+
+This bootstrap pattern provides a foundation for building MCP servers that are:
+
+- **Modular**: Clear separation of concerns
+- **Type-safe**: Strong TypeScript typing
+- **Multi-tenant ready**: Isolated instances per user
+- **Library-friendly**: Dual build strategy
+- **mcp-auth compatible**: Works with authentication framework
+
+The pattern emphasizes **organization and structure** over specific implementations, allowing flexibility in choosing tools and technologies while maintaining consistency and compatibility.

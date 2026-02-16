@@ -1,0 +1,202 @@
+# Project Progress Tracking
+# This file tracks the overall progress of the task-mcp project
+
+project:
+  name: task-mcp
+  version: 0.1.0
+  started: 2026-02-16
+  status: not_started
+  current_milestone: M2
+  description: |
+    MCP server for task execution system - Port ACP-style autonomous task execution 
+    from Roo Code to agentbase.me using MCP server architecture. Enables long-running, 
+    autonomous task execution where agents work through structured milestones and tasks 
+    independently in the background.
+
+# Milestones represent major phases of the project
+milestones:
+  - id: M1
+    name: Planning and Design
+    status: completed
+    progress: 100
+    started: 2026-02-16
+    completed: 2026-02-16
+    estimated_weeks: 1
+    tasks_completed: 3
+    tasks_total: 3
+    notes: |
+      Completed comprehensive design documentation including:
+      - ACP Task Execution Requirements (design document)
+      - Code Extraction Guide (porting guide from Roo Code)
+      - Milestone 2 planning document
+      All design documents are complete and ready for implementation.
+  
+  - id: M2
+    name: MCP Server Foundation
+    status: not_started
+    progress: 0
+    started: null
+    completed: null
+    estimated_weeks: 2
+    tasks_completed: 0
+    tasks_total: 3
+    notes: |
+      Create task-mcp server with core task management tools.
+      This milestone follows the MCP Server Bootstrap Pattern.
+      Dependencies: Firebase project with Firestore, Service account key, Node.js 18+
+
+# Tasks are granular work items within milestones
+tasks:
+  milestone_1:
+    - id: task-design
+      name: ACP Task Execution Requirements
+      status: completed
+      file: agent/design/acp-task-execution-requirements.md
+      estimated_hours: 8
+      completed_date: 2026-02-16
+      notes: |
+        Comprehensive design document for porting ACP task execution to agentbase.me
+    
+    - id: task-extraction
+      name: Code Extraction Guide
+      status: completed
+      file: agent/design/code-extraction-guide.md
+      estimated_hours: 6
+      completed_date: 2026-02-16
+      notes: |
+        Detailed guide for extracting and adapting code from Roo Code
+    
+    - id: task-milestone-2
+      name: Milestone 2 Planning
+      status: completed
+      file: agent/milestones/milestone-2-task-infrastructure.md
+      estimated_hours: 4
+      completed_date: 2026-02-16
+      notes: |
+        Detailed milestone document for MCP Server Foundation phase
+  
+  milestone_2:
+    - id: task-86
+      name: Task Data Model and Schemas
+      status: not_started
+      file: agent/tasks/task-86-task-data-model-schemas.md
+      estimated_hours: 8
+      completed_date: null
+      notes: |
+        Create Firestore data model, TypeScript interfaces, and Zod schemas
+    
+    - id: task-87
+      name: Task Database Service
+      status: not_started
+      file: agent/tasks/task-87-task-database-service.md
+      estimated_hours: 12
+      completed_date: null
+      notes: |
+        Create database service for task CRUD operations and progress tracking
+    
+    - id: task-88
+      name: Task Execution Engine
+      status: not_started
+      file: agent/tasks/task-88-task-execution-engine.md
+      estimated_hours: 16
+      completed_date: null
+      notes: |
+        Create TaskExecutor class adapted from Roo Code's Task class
+
+# Documentation tracking
+documentation:
+  design_documents: 3
+  milestone_documents: 1
+  pattern_documents: 1
+  task_documents: 3
+  last_updated: 2026-02-16
+
+# Overall progress metrics
+progress:
+  planning: 100
+  implementation: 0
+  testing: 0
+  documentation: 100
+  overall: 20
+
+# Recent work log (most recent first)
+recent_work:
+  - date: 2026-02-16
+    description: |
+      Initialized ACP context for task-mcp project. Completed comprehensive 
+      planning and design phase.
+    items:
+      - ✅ Read all agent documentation (9 files)
+      - ✅ Analyzed design documents and requirements
+      - ✅ Reviewed milestone and task structure
+      - ✅ Created progress.yaml tracking file
+      - 📋 Ready to begin Milestone 2 implementation
+
+# Next steps (prioritized list)
+next_steps:
+  - Begin Milestone 2: MCP Server Foundation
+  - Start with Task 86: Task Data Model and Schemas
+  - Set up task-mcp project structure
+  - Initialize Node.js project with TypeScript
+  - Create Firebase Admin SDK client wrapper
+
+# General notes and observations
+notes:
+  - Project follows MCP Server Bootstrap Pattern from agent/patterns/bootstrap.md
+  - Design is based on porting Roo Code's task execution to MCP server architecture
+  - Uses pessimistic execution model (continuous work until paused/complete)
+  - MCP server will be separate from agentbase.me codebase for modularity
+  - Firebase Admin SDK with service account for direct Firestore access
+  - All design documents are comprehensive and implementation-ready
+
+# Current blockers (remove when resolved)
+current_blockers: []
+
+# Team and contributors
+team:
+  - role: Lead Developer
+    name: Agent
+    focus: |
+      Currently in initialization phase. Ready to begin implementation of 
+      Milestone 2 (MCP Server Foundation).
+
+# Dependencies and integrations
+dependencies:
+  external_services:
+    - name: Firebase/Firestore
+      status: pending
+      notes: |
+        Need Firebase project with Firestore database and service account key
+    
+    - name: AWS Bedrock
+      status: pending
+      notes: |
+        For AI model integration in task execution
+  
+  libraries:
+    - name: "@modelcontextprotocol/sdk"
+      version: "^1.0.0"
+      purpose: |
+        MCP protocol implementation for server
+    
+    - name: "firebase-admin"
+      version: "latest"
+      purpose: |
+        Direct Firestore access with service account
+    
+    - name: "zod"
+      version: "latest"
+      purpose: |
+        Schema validation for task data models
+  
+  infrastructure:
+    - name: Cloud Run
+      status: pending
+      notes: |
+        Deployment target for MCP server (recommended approach)
+
+# Quality metrics
+quality:
+  test_coverage: 0
+  code_review_status: pending
+  documentation_status: complete

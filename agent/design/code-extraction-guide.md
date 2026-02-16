@@ -3,6 +3,7 @@
 **Purpose**: Document specific code patterns and components to extract from Roo Code for task-mcp implementation
 **Created**: 2026-02-16
 **Status**: Active Reference
+**Roo Code Repository**: `/home/prmichaelsen/Roo-Code`
 
 ---
 
@@ -10,11 +11,20 @@
 
 This document identifies specific code samples from Roo Code that should be ported to task-mcp, with adaptation notes for the MCP server environment.
 
+**Important**: When referencing Roo Code source files, use the full path `/home/prmichaelsen/Roo-Code/` to locate files. This is the root directory of the Roo Code repository that contains the implementation patterns we're porting.
+
+### How to Use This Guide
+
+1. **Locate Source Files**: All file paths are relative to `/home/prmichaelsen/Roo-Code/`
+2. **Read Source Code**: Use the full path when reading files (e.g., `/home/prmichaelsen/Roo-Code/src/core/task/Task.ts`)
+3. **Validate Assumptions**: Cross-reference this guide with actual source code before implementing
+4. **Search for Patterns**: Use `search_files` tool in `/home/prmichaelsen/Roo-Code/` to find additional examples
+
 ---
 
 ## 1. Message Queue System
 
-### Source: `src/core/message-queue/MessageQueueService.ts`
+### Source: `/home/prmichaelsen/Roo-Code/src/core/message-queue/MessageQueueService.ts`
 
 **What it does**: Queues user messages while agent is working, processes them when idle
 
@@ -75,7 +85,7 @@ export class MessageQueue extends EventEmitter {
 
 ## 2. Tool Execution Pattern
 
-### Source: `src/core/tools/BaseTool.ts` and tool implementations
+### Source: `/home/prmichaelsen/Roo-Code/src/core/tools/BaseTool.ts` and tool implementations
 
 **What it does**: Base class for all tools with common execution logic
 
@@ -132,7 +142,7 @@ export interface Tool {
 
 ### Example 1: UpdateTodoListTool
 
-**Source**: `src/core/tools/UpdateTodoListTool.ts`
+**Source**: `/home/prmichaelsen/Roo-Code/src/core/tools/UpdateTodoListTool.ts`
 
 **Roo Code Implementation**:
 ```typescript
@@ -200,7 +210,7 @@ export async function handleTaskUpdateTodos(
 
 ### Example 2: ExecuteCommandTool (NOT PORTED)
 
-**Source**: `src/core/tools/ExecuteCommandTool.ts`
+**Source**: `/home/prmichaelsen/Roo-Code/src/core/tools/ExecuteCommandTool.ts`
 
 **Why NOT port**: 
 - Requires terminal access (not available in MCP server)
@@ -213,7 +223,7 @@ export async function handleTaskUpdateTodos(
 
 ### Example 3: ReadFileTool (ADAPTED)
 
-**Source**: `src/core/tools/ReadFileTool.ts`
+**Source**: `/home/prmichaelsen/Roo-Code/src/core/tools/ReadFileTool.ts`
 
 **Roo Code**: Reads files from local file system
 
@@ -253,7 +263,9 @@ export async function handleTaskReadFile(
 
 ## 4. Task Lifecycle Management
 
-### Source: `src/core/task/Task.ts` (lines 1924-2100)
+### Source: `/home/prmichaelsen/Roo-Code/src/core/task/Task.ts` (lines 1924-2100)
+
+**Full Path**: `/home/prmichaelsen/Roo-Code/src/core/task/Task.ts`
 
 **Key Methods**:
 ```typescript
@@ -319,7 +331,7 @@ export async function handleTaskResume(
 
 ## 5. Progress Tracking
 
-### Source: `src/core/task-persistence/taskMetadata.ts`
+### Source: `/home/prmichaelsen/Roo-Code/src/core/task-persistence/taskMetadata.ts`
 
 **What it does**: Manages task metadata and progress tracking
 
@@ -364,7 +376,9 @@ export function findCurrentTask(
 
 ## 6. API Message History
 
-### Source: `src/core/task/Task.ts` (lines 862-1010)
+### Source: `/home/prmichaelsen/Roo-Code/src/core/task/Task.ts` (lines 862-1010)
+
+**Full Path**: `/home/prmichaelsen/Roo-Code/src/core/task/Task.ts`
 
 **What it does**: Manages conversation history with API
 
@@ -411,7 +425,7 @@ export class FirebaseClient {
 
 ## 7. Tool Result Formatting
 
-### Source: `src/core/tools/helpers/toolResultFormatting.ts`
+### Source: `/home/prmichaelsen/Roo-Code/src/core/tools/helpers/toolResultFormatting.ts`
 
 **What it does**: Formats tool invocations and results for display
 
@@ -455,7 +469,7 @@ export function formatToolResult(
 
 ## 8. Auto-Approval Logic
 
-### Source: `src/core/auto-approval/AutoApprovalHandler.ts`
+### Source: `/home/prmichaelsen/Roo-Code/src/core/auto-approval/AutoApprovalHandler.ts`
 
 **What it does**: Automatically approves certain tool calls based on patterns
 
@@ -506,7 +520,7 @@ export function shouldAutoApprove(
 
 ## 9. Error Handling Patterns
 
-### Source: Multiple tool files
+### Source: Multiple tool files in `/home/prmichaelsen/Roo-Code/src/core/tools/`
 
 **Common Pattern**:
 ```typescript
@@ -558,7 +572,7 @@ export const handleTaskGetStatus = wrapToolHandler(
 
 ## 10. State Persistence
 
-### Source: `src/core/task-persistence/`
+### Source: `/home/prmichaelsen/Roo-Code/src/core/task-persistence/`
 
 **What it does**: Save and restore task state from file system
 
@@ -623,7 +637,9 @@ export class FirebaseClient {
 
 ## 11. Event Emission for UI Updates
 
-### Source: `src/core/task/Task.ts` (EventEmitter usage)
+### Source: `/home/prmichaelsen/Roo-Code/src/core/task/Task.ts` (EventEmitter usage)
+
+**Full Path**: `/home/prmichaelsen/Roo-Code/src/core/task/Task.ts`
 
 **What it does**: Emits events for UI to listen to
 
@@ -677,7 +693,7 @@ export class FirebaseClient {
 
 ## 12. Tool Registry Pattern
 
-### Source: `src/core/prompts/tools/native-tools/index.ts`
+### Source: `/home/prmichaelsen/Roo-Code/src/core/prompts/tools/native-tools/index.ts`
 
 **What it does**: Registers all available tools
 
@@ -755,6 +771,48 @@ export const toolHandlers = {
 
 ---
 
+## Quick Reference: Key Roo Code Files
+
+For quick access when implementing task-mcp, here are the most important source files:
+
+### Core Task Implementation
+- **Main Task Class**: `/home/prmichaelsen/Roo-Code/src/core/task/Task.ts`
+  - Lines 1924-2100: Lifecycle management (start, pause, resume, abort)
+  - Lines 862-1010: API message history management
+  - Full file: ~2500 lines of task execution logic
+
+### Tool System
+- **Base Tool**: `/home/prmichaelsen/Roo-Code/src/core/tools/BaseTool.ts`
+- **Tool Registry**: `/home/prmichaelsen/Roo-Code/src/core/prompts/tools/native-tools/index.ts`
+- **Tool Implementations**: `/home/prmichaelsen/Roo-Code/src/core/tools/*.ts`
+
+### State Management
+- **Message Queue**: `/home/prmichaelsen/Roo-Code/src/core/message-queue/MessageQueueService.ts`
+- **Task Persistence**: `/home/prmichaelsen/Roo-Code/src/core/task-persistence/`
+- **Task Metadata**: `/home/prmichaelsen/Roo-Code/src/core/task-persistence/taskMetadata.ts`
+
+### Utilities
+- **Tool Formatting**: `/home/prmichaelsen/Roo-Code/src/core/tools/helpers/toolResultFormatting.ts`
+- **Auto-Approval**: `/home/prmichaelsen/Roo-Code/src/core/auto-approval/AutoApprovalHandler.ts`
+
+### Search Tips
+
+When you need to find specific patterns in Roo Code:
+
+```bash
+# Search for tool implementations
+search_files path="/home/prmichaelsen/Roo-Code/src/core/tools" regex="class.*Tool.*extends.*BaseTool"
+
+# Search for event emissions
+search_files path="/home/prmichaelsen/Roo-Code/src/core/task" regex="this\.emit\("
+
+# Search for Firestore operations (if any)
+search_files path="/home/prmichaelsen/Roo-Code" regex="firestore|Firestore"
+
+# Search for API message handling
+search_files path="/home/prmichaelsen/Roo-Code/src/core/task" regex="ApiMessage|api.*message"
+```
+
 ## Next Steps
 
 1. Create detailed extraction documents for each component
@@ -765,4 +823,5 @@ export const toolHandlers = {
 ---
 
 **Status**: Active Reference
+**Roo Code Path**: `/home/prmichaelsen/Roo-Code`
 **Last Updated**: 2026-02-16
