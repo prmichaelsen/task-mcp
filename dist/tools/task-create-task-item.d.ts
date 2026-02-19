@@ -3,7 +3,7 @@
  *
  * Create a new task item within a milestone.
  */
-import { FirebaseClient } from '@/client.js';
+import { FirebaseClient } from '@prmichaelsen/task-core/client';
 export declare const taskCreateTaskItemTool: {
     name: string;
     description: string;

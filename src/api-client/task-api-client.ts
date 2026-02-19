@@ -19,7 +19,7 @@ import type {
   TaskStatus,
   MilestoneApiResponse,
   TaskItemApiResponse
-} from '../dto/task-api.dto.js'
+} from '@prmichaelsen/task-core/dto'
 
 import {
   TaskApiError,

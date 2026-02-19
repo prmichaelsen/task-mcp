@@ -3,10 +3,10 @@
  */
 
 import { handleTaskGetNextStep, taskGetNextStepTool } from './task-get-next-step.js'
-import { FirebaseClient } from '@/client.js'
-import type { Task } from '@/schemas/task.js'
+import { FirebaseClient } from '@prmichaelsen/task-core/client'
+import type { Task } from '@prmichaelsen/task-core/schemas'
 
-jest.mock('@/client.js')
+jest.mock('@prmichaelsen/task-core/client')
 
 describe('task_get_next_step', () => {
   let mockClient: jest.Mocked<FirebaseClient>

@@ -3,7 +3,7 @@
  *
  * Create a new milestone in a task.
  */
-import { FirebaseClient } from '@/client.js';
+import { FirebaseClient } from '@prmichaelsen/task-core/client';
 export declare const taskCreateMilestoneTool: {
     name: string;
     description: string;

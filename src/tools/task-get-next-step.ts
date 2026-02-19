@@ -5,7 +5,7 @@
  * Returns the current task item with steps and verification criteria.
  */
 
-import { FirebaseClient } from '@/client.js'
+import { FirebaseClient } from '@prmichaelsen/task-core/client'
 
 export const taskGetNextStepTool = {
   name: 'task_get_next_step',

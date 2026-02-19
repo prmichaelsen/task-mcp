@@ -4,7 +4,7 @@
  * REST API client for consuming task-mcp REST API.
  * Provides type-safe methods, authentication, error handling, and retry logic.
  */
-import type { TaskApiResponse, TaskListApiResponse, TaskMessageListApiResponse, CreateTaskDto, UpdateTaskDto, CreateMessageDto, UpdateProgressDto, CreateMilestoneDto, CreateTaskItemDto, TaskStatus, MilestoneApiResponse, TaskItemApiResponse } from '../dto/task-api.dto.js';
+import type { TaskApiResponse, TaskListApiResponse, TaskMessageListApiResponse, CreateTaskDto, UpdateTaskDto, CreateMessageDto, UpdateProgressDto, CreateMilestoneDto, CreateTaskItemDto, TaskStatus, MilestoneApiResponse, TaskItemApiResponse } from '@prmichaelsen/task-core/dto';
 /**
  * Configuration options for TaskApiClient
  */

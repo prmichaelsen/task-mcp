@@ -5,7 +5,7 @@
  * This is a convenience tool that combines completing a task item and getting the next step.
  */
 
-import { FirebaseClient } from '@/client.js'
+import { FirebaseClient } from '@prmichaelsen/task-core/client'
 import { handleTaskCompleteTaskItem } from './task-complete-task-item.js'
 import { handleTaskGetNextStep } from './task-get-next-step.js'
 

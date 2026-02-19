@@ -4,7 +4,7 @@
  * Mark a task item as complete and update milestone progress.
  */
 
-import { FirebaseClient } from '@/client.js'
+import { FirebaseClient } from '@prmichaelsen/task-core/client'
 
 export const taskCompleteTaskItemTool = {
   name: 'task_complete_task_item',

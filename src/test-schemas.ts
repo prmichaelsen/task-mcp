@@ -13,7 +13,7 @@ import {
   type Milestone,
   type TaskItem,
   type TaskMessage
-} from './schemas/task.js'
+} from '@prmichaelsen/task-core/schemas'
 
 // Test valid milestone
 const validMilestone: Milestone = {

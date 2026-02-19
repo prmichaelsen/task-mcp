@@ -12,7 +12,7 @@ import {
   ErrorCode,
   McpError
 } from '@modelcontextprotocol/sdk/types.js'
-import { FirebaseClient } from './client.js'
+import { FirebaseClient } from '@prmichaelsen/task-core/client'
 import { allTools, getToolHandler } from './tools/index.js'
 
 /**

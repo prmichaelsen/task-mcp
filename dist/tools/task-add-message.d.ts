@@ -3,7 +3,7 @@
  *
  * Add a message to the task conversation thread.
  */
-import { FirebaseClient } from '@/client.js';
+import { FirebaseClient } from '@prmichaelsen/task-core/client';
 export declare const taskAddMessageTool: {
     name: string;
     description: string;

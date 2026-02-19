@@ -4,7 +4,7 @@
  * Update the overall progress percentage for a task.
  */
 
-import { FirebaseClient } from '@/client.js'
+import { FirebaseClient } from '@prmichaelsen/task-core/client'
 
 export const taskUpdateProgressTool = {
   name: 'task_update_progress',

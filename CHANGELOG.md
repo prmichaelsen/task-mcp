@@ -7,6 +7,43 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.0] - 2026-02-19
+
+### Changed
+- **BREAKING**: Migrated to `@prmichaelsen/task-core` package for core business logic
+  - Core functionality (schemas, DTOs, services, Firebase client) now provided by external package
+  - Reduced package size by removing ~2000+ lines of duplicated code
+  - Enables code reuse between MCP server and REST API service
+
+### Removed
+- **BREAKING**: Local core files moved to `@prmichaelsen/task-core`
+  - Removed `src/schemas/` - Use `@prmichaelsen/task-core/schemas`
+  - Removed `src/dto/` - Use `@prmichaelsen/task-core/dto`
+  - Removed `src/services/` - Use `@prmichaelsen/task-core/services`
+  - Removed `src/client.ts` - Use `@prmichaelsen/task-core/client`
+  - Removed `src/constant/` - Use `@prmichaelsen/task-core/constants`
+- **BREAKING**: Package exports for core modules
+  - Removed `./schemas`, `./dto`, `./services`, `./client`, `./constants` exports
+  - Only MCP-specific exports remain: `./` (server), `./factory`, `./api-client`
+- Dependencies now provided by task-core
+  - Removed `firebase-admin` from direct dependencies
+  - Removed `zod` from direct dependencies
+
+### Added
+- Dependency on `@prmichaelsen/task-core@^1.0.1`
+- Jest mocks for external task-core package
+
+### Migration Guide
+To migrate from v0.4.0 to v1.0.0:
+
+1. **Install task-core**: Already included as dependency
+2. **Update imports**:
+   - `@prmichaelsen/task-mcp/schemas` → `@prmichaelsen/task-core/schemas`
+   - `@prmichaelsen/task-mcp/dto` → `@prmichaelsen/task-core/dto`
+   - `@prmichaelsen/task-mcp/services` → `@prmichaelsen/task-core/services`
+   - `@prmichaelsen/task-mcp/client` → `@prmichaelsen/task-core/client`
+3. **MCP server usage unchanged**: The MCP server exports remain the same
+
 ## [0.4.0] - 2026-02-16
 
 ### Added

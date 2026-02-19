@@ -3,15 +3,21 @@
  */
 
 import { createServer } from './server-factory.js'
-import { FirebaseClient } from './client.js'
+import { FirebaseClient } from '@prmichaelsen/task-core/client'
 
-// Mock FirebaseClient
-jest.mock('./client.js', () => ({
-  FirebaseClient: jest.fn().mockImplementation(() => ({
-    connect: jest.fn().mockResolvedValue(undefined),
-    disconnect: jest.fn().mockResolvedValue(undefined)
-  }))
-}))
+// Mock FirebaseClient from task-core
+jest.mock('@prmichaelsen/task-core/client', () => {
+  return {
+    FirebaseClient: jest.fn().mockImplementation(() => {
+      return {
+        connect: jest.fn().mockResolvedValue(undefined),
+        disconnect: jest.fn().mockResolvedValue(undefined),
+        getTask: jest.fn().mockResolvedValue(null),
+        updateTask: jest.fn().mockResolvedValue(undefined)
+      }
+    })
+  }
+})
 
 describe('Server Factory', () => {
   describe('Parameter Validation', () => {

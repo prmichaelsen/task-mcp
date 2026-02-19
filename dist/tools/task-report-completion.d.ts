@@ -4,7 +4,7 @@
  * Agent reports completion of a task item and gets next instructions.
  * This is a convenience tool that combines completing a task item and getting the next step.
  */
-import { FirebaseClient } from '@/client.js';
+import { FirebaseClient } from '@prmichaelsen/task-core/client';
 export declare const taskReportCompletionTool: {
     name: string;
     description: string;

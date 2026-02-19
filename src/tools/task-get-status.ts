@@ -5,7 +5,7 @@
  * Returns task title, status, current milestone, and overall progress.
  */
 
-import { FirebaseClient } from '@/client.js'
+import { FirebaseClient } from '@prmichaelsen/task-core/client'
 
 export const taskGetStatusTool = {
   name: 'task_get_status',

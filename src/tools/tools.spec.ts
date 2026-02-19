@@ -7,10 +7,10 @@ import { handleTaskCompleteTaskItem } from './task-complete-task-item.js'
 import { handleTaskCreateMilestone } from './task-create-milestone.js'
 import { handleTaskCreateTaskItem } from './task-create-task-item.js'
 import { handleTaskAddMessage } from './task-add-message.js'
-import { FirebaseClient } from '@/client.js'
-import type { Task } from '@/schemas/task.js'
+import { FirebaseClient } from '@prmichaelsen/task-core/client'
+import type { Task } from '@prmichaelsen/task-core/schemas'
 
-jest.mock('@/client.js')
+jest.mock('@prmichaelsen/task-core/client')
 
 describe('MCP Tools', () => {
   let mockClient: jest.Mocked<FirebaseClient>

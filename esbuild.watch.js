@@ -18,8 +18,8 @@ const serverContext = await esbuild.context({
   outfile: 'dist/server.js',
   sourcemap: true,
   external: [
-    'firebase-admin',
-    '@modelcontextprotocol/sdk'
+    '@modelcontextprotocol/sdk',
+    '@prmichaelsen/task-core'
   ],
   banner: {
     js: '#!/usr/bin/env node\nimport { createRequire } from \'module\'; const require = createRequire(import.meta.url);'
@@ -36,75 +36,9 @@ const factoryContext = await esbuild.context({
   outfile: 'dist/server-factory.js',
   sourcemap: true,
   external: [
-    'firebase-admin',
-    '@modelcontextprotocol/sdk'
+    '@modelcontextprotocol/sdk',
+    '@prmichaelsen/task-core'
   ],
-  banner: {
-    js: 'import { createRequire } from \'module\'; const require = createRequire(import.meta.url);'
-  }
-})
-
-// Watch client
-const clientContext = await esbuild.context({
-  entryPoints: ['src/client.ts'],
-  bundle: true,
-  platform: 'node',
-  target: 'node20',
-  format: 'esm',
-  outfile: 'dist/client.js',
-  sourcemap: true,
-  external: [
-    'firebase-admin'
-  ],
-  banner: {
-    js: 'import { createRequire } from \'module\'; const require = createRequire(import.meta.url);'
-  }
-})
-
-// Watch services
-const servicesContext = await esbuild.context({
-  entryPoints: ['src/services/task-database.service.ts'],
-  bundle: true,
-  platform: 'node',
-  target: 'node20',
-  format: 'esm',
-  outfile: 'dist/services/task-database.service.js',
-  sourcemap: true,
-  external: [
-    'firebase-admin'
-  ],
-  banner: {
-    js: 'import { createRequire } from \'module\'; const require = createRequire(import.meta.url);'
-  }
-})
-
-// Watch schemas
-const schemasContext = await esbuild.context({
-  entryPoints: ['src/schemas/task.ts'],
-  bundle: true,
-  platform: 'node',
-  target: 'node20',
-  format: 'esm',
-  outfile: 'dist/schemas/task.js',
-  sourcemap: true,
-  external: [
-    'zod'
-  ],
-  banner: {
-    js: 'import { createRequire } from \'module\'; const require = createRequire(import.meta.url);'
-  }
-})
-
-// Watch DTOs
-const dtoContext = await esbuild.context({
-  entryPoints: ['src/dto/index.ts'],
-  bundle: true,
-  platform: 'node',
-  target: 'node20',
-  format: 'esm',
-  outfile: 'dist/dto/index.js',
-  sourcemap: true,
-  external: [],
   banner: {
     js: 'import { createRequire } from \'module\'; const require = createRequire(import.meta.url);'
   }
@@ -119,7 +53,7 @@ const apiClientContext = await esbuild.context({
   format: 'esm',
   outfile: 'dist/api-client/index.js',
   sourcemap: true,
-  external: [],
+  external: ['@prmichaelsen/task-core'],
   banner: {
     js: 'import { createRequire } from \'module\'; const require = createRequire(import.meta.url);'
   }
@@ -129,10 +63,6 @@ const apiClientContext = await esbuild.context({
 await Promise.all([
   serverContext.watch(),
   factoryContext.watch(),
-  clientContext.watch(),
-  servicesContext.watch(),
-  schemasContext.watch(),
-  dtoContext.watch(),
   apiClientContext.watch()
 ])
 

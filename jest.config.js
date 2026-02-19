@@ -16,6 +16,9 @@ export default {
     '!src/test-schemas.ts',
   ],
   moduleNameMapper: {
+    '^@prmichaelsen/task-core/client$': '<rootDir>/__mocks__/@prmichaelsen/task-core.ts',
+    '^@prmichaelsen/task-core/services$': '<rootDir>/__mocks__/@prmichaelsen/task-core.ts',
+    '^@prmichaelsen/task-core/schemas$': '<rootDir>/__mocks__/@prmichaelsen/task-core.ts',
     '^@/(.*)\\.(js|ts)$': '<rootDir>/src/$1',
     '^@/(.*)$': '<rootDir>/src/$1',
     '^(\\.{1,2}/.*)\\.js$': '$1',

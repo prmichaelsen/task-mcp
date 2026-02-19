@@ -21,8 +21,8 @@ await esbuild.build({
   outfile: 'dist/server.js',
   sourcemap: true,
   external: [
-    'firebase-admin',
-    '@modelcontextprotocol/sdk'
+    '@modelcontextprotocol/sdk',
+    '@prmichaelsen/task-core'
   ],
   banner: {
     js: '#!/usr/bin/env node\nimport { createRequire } from \'module\'; const require = createRequire(import.meta.url);'
@@ -41,88 +41,14 @@ await esbuild.build({
   outfile: 'dist/server-factory.js',
   sourcemap: true,
   external: [
-    'firebase-admin',
-    '@modelcontextprotocol/sdk'
+    '@modelcontextprotocol/sdk',
+    '@prmichaelsen/task-core'
   ],
   banner: {
     js: 'import { createRequire } from \'module\'; const require = createRequire(import.meta.url);'
   }
 })
 console.log('✓ Server factory built')
-
-// Build client
-console.log('Building client...')
-await esbuild.build({
-  entryPoints: ['src/client.ts'],
-  bundle: true,
-  platform: 'node',
-  target: 'node20',
-  format: 'esm',
-  outfile: 'dist/client.js',
-  sourcemap: true,
-  external: [
-    'firebase-admin'
-  ],
-  banner: {
-    js: 'import { createRequire } from \'module\'; const require = createRequire(import.meta.url);'
-  }
-})
-console.log('✓ Client built')
-
-// Build services
-console.log('Building services...')
-await esbuild.build({
-  entryPoints: ['src/services/task-database.service.ts'],
-  bundle: true,
-  platform: 'node',
-  target: 'node20',
-  format: 'esm',
-  outfile: 'dist/services/task-database.service.js',
-  sourcemap: true,
-  external: [
-    'firebase-admin'
-  ],
-  banner: {
-    js: 'import { createRequire } from \'module\'; const require = createRequire(import.meta.url);'
-  }
-})
-console.log('✓ Services built')
-
-// Build schemas
-console.log('Building schemas...')
-await esbuild.build({
-  entryPoints: ['src/schemas/task.ts'],
-  bundle: true,
-  platform: 'node',
-  target: 'node20',
-  format: 'esm',
-  outfile: 'dist/schemas/task.js',
-  sourcemap: true,
-  external: [
-    'zod'
-  ],
-  banner: {
-    js: 'import { createRequire } from \'module\'; const require = createRequire(import.meta.url);'
-  }
-})
-console.log('✓ Schemas built')
-
-// Build DTOs
-console.log('Building DTOs...')
-await esbuild.build({
-  entryPoints: ['src/dto/index.ts'],
-  bundle: true,
-  platform: 'node',
-  target: 'node20',
-  format: 'esm',
-  outfile: 'dist/dto/index.js',
-  sourcemap: true,
-  external: [],
-  banner: {
-    js: 'import { createRequire } from \'module\'; const require = createRequire(import.meta.url);'
-  }
-})
-console.log('✓ DTOs built')
 
 // Build API client
 console.log('Building API client...')
@@ -134,7 +60,7 @@ await esbuild.build({
   format: 'esm',
   outfile: 'dist/api-client/index.js',
   sourcemap: true,
-  external: [],
+  external: ['@prmichaelsen/task-core'],
   banner: {
     js: 'import { createRequire } from \'module\'; const require = createRequire(import.meta.url);'
   }
