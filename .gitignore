@@ -1,3 +1,5 @@
 firebase-debug.log
 node_modules
-buildcoverage/
+build
+coverage/
+
