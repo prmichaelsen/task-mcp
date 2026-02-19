@@ -1,15 +1,22 @@
 /**
  * MCP Tool: task_create_task_item
- * 
+ *
  * Create a new task item within a milestone.
  */
 
 import { FirebaseClient } from '@prmichaelsen/task-core/client'
 import type { TaskItem } from '@prmichaelsen/task-core/schemas'
+import { TASK_ITEM_TEMPLATE } from './templates.js'
 
 export const taskCreateTaskItemTool = {
   name: 'task_create_task_item',
-  description: 'Create a new task item within a milestone',
+  description: `Create a new task item within a milestone.
+
+NOTE: Task items correspond to ACP Tasks and should follow this structure:
+
+${TASK_ITEM_TEMPLATE}
+
+Use the 'description' parameter to provide the full task content following this structure.`,
   inputSchema: {
     type: 'object',
     properties: {

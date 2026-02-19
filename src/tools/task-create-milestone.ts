@@ -6,10 +6,17 @@
 
 import { FirebaseClient } from '@prmichaelsen/task-core/client'
 import type { Milestone } from '@prmichaelsen/task-core/schemas'
+import { MILESTONE_TEMPLATE } from './templates.js'
 
 export const taskCreateMilestoneTool = {
   name: 'task_create_milestone',
-  description: 'Create a new milestone in a task',
+  description: `Create a new milestone in a task.
+
+NOTE: Milestones correspond to ACP Milestones and should follow this structure:
+
+${MILESTONE_TEMPLATE}
+
+Use the 'description' parameter to provide the full milestone content following this structure.`,
   inputSchema: {
     type: 'object',
     properties: {

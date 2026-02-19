@@ -7,6 +7,93 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.0.0] - 2026-02-19
+
+### Known Limitations
+- **No delete operations for milestones and task items**: FirebaseClient doesn't expose methods to delete embedded entities
+  - Milestones and task items are embedded in task document
+  - Requires task-core enhancement to add `updateTask()` method
+  - Workaround: Update task item status to indicate it's no longer active
+  - Future: Add `task_delete_milestone` and `task_delete_task_item` when task-core supports it
+
+### Added
+- **`task_get_tasks` tool** - List all tasks with optional status filtering
+  - Discover available tasks when no task ID is known
+  - Filter by status (not_started, in_progress, paused, completed, failed)
+  - Limit results (default: 50, max: 100)
+  - Returns summary with id, title, status, progress
+- **`task_get_task` tool** - Get complete task object by ID
+  - Replaces task_get_status with raw task data
+  - Agents determine next steps from progress object
+- **`task_get_milestone` tool** - Get milestone by ID
+  - Complete CRUD for milestones
+- **`task_get_task_item` tool** - Get task item by ID
+  - Complete CRUD for task items
+- **`task_update_milestone` tool** - Update milestone properties
+  - Supports status, progress, description updates
+  - Validates milestone exists
+- **`task_update_task_item` tool** - Update task item properties
+  - Supports status, description, estimated_hours updates
+  - Auto-recalculates milestone progress
+- **ACP Template Guidance** - Embedded complete templates in tool descriptions
+  - Full ACP Milestone template in task_create_milestone
+  - Full ACP Task template in task_create_task_item
+  - Guides agents in creating properly structured documents
+
+### Changed
+- **BREAKING**: Complete API redesign for consistency
+  - Consistent naming: task_<verb>_<entity>
+  - Complete CRUD operations for all entities
+  - Tool count: 13 tools (was 9)
+- **Tool organization**: Grouped by entity
+  - Task CRUD: create, get (plural), get, update, delete (5 tools)
+  - Milestone CRU: create, get, update (3 tools)
+  - Task Item CRU: create, get, update (3 tools)
+  - Progress & Communication: update_progress, add_message (2 tools)
+
+### Removed
+- **BREAKING**: `task_get_status` - Use `task_get_task` instead
+  - task_get_task returns complete task object
+  - Agents determine status from task.status and task.progress
+- **BREAKING**: `task_get_next_step` - Use `task_get_task` instead
+  - Agents determine next step from task.progress object
+  - Eliminates redundant "instruction generation" logic
+- **BREAKING**: `task_complete_task_item` - Use `task_update_task_item` instead
+  - Set status="completed" for same behavior
+- **BREAKING**: `task_report_completion` - Use `task_update_task_item` + `task_get_task` instead
+  - Removed convenience tool in favor of explicit operations
+
+### Migration Guide
+
+**For task item completion:**
+```typescript
+// Old (deprecated)
+task_complete_task_item(task_id, milestone_id, task_item_id)
+
+// New (recommended)
+task_update_task_item(task_id, milestone_id, task_item_id, { status: "completed" })
+```
+
+**For reporting completion and getting next step:**
+```typescript
+// Old (deprecated)
+task_report_completion(task_id, milestone_id, task_item_id, notes)
+
+// New (recommended)
+task_update_task_item(task_id, milestone_id, task_item_id, { status: "completed" })
+task_add_message(task_id, "assistant", notes)  // if notes needed
+task_get_next_step(task_id)
+```
+
+**For milestone updates:**
+```typescript
+// New capability
+task_update_milestone(task_id, milestone_id, {
+  status: "completed",
+  progress: 100
+})
+```
+
 ## [1.2.0] - 2026-02-19
 
 ### Added

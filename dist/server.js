@@ -18,7 +18,19 @@ import { FirebaseClient } from "@prmichaelsen/task-core/client";
 // src/tools/task-create-task.ts
 var taskCreateTaskTool = {
   name: "task_create_task",
-  description: "Create a new task with title and description",
+  description: `Create a new task with title and description.
+
+NOTE: Tasks in this system correspond to ACP Projects. The task's progress structure follows the ACP progress.yaml format with:
+- Milestones (major phases)
+- Task Items (granular work items within milestones)
+- Progress tracking (percentages, status, completion dates)
+
+After creating a task, use:
+- task_create_milestone to add milestones
+- task_create_task_item to add task items to milestones
+- task_update_progress to track overall completion
+
+The progress structure matches agent/progress.yaml format but stored as Firestore objects.`,
   inputSchema: {
     type: "object",
     properties: {
@@ -84,6 +96,83 @@ async function handleTaskCreateTask(client, args) {
     }, null, 2);
   } catch (error) {
     throw new Error(`Failed to create task: ${error instanceof Error ? error.message : String(error)}`);
+  }
+}
+
+// src/tools/task-get-tasks.ts
+var taskGetTasksTool = {
+  name: "task_get_tasks",
+  description: "List all tasks for the current user, optionally filtered by status",
+  inputSchema: {
+    type: "object",
+    properties: {
+      status: {
+        type: "string",
+        enum: ["not_started", "in_progress", "paused", "completed", "failed"],
+        description: "Filter by task status (optional)"
+      },
+      limit: {
+        type: "number",
+        minimum: 1,
+        maximum: 100,
+        default: 50,
+        description: "Maximum number of tasks to return (optional, default: 50)"
+      }
+    },
+    required: []
+  }
+};
+async function handleTaskGetTasks(client, args) {
+  try {
+    let tasks;
+    if (args.status) {
+      tasks = await client.getTasksByStatus(args.status, args.limit || 50);
+    } else {
+      tasks = await client.listTasks(args.limit || 50);
+    }
+    return JSON.stringify({
+      tasks: tasks.map((t) => ({
+        id: t.id,
+        title: t.title,
+        status: t.status,
+        created_at: t.created_at,
+        updated_at: t.updated_at,
+        overall_progress: t.progress.overall_percentage,
+        current_milestone: t.progress.current_milestone,
+        milestones_count: t.progress.milestones.length
+      })),
+      count: tasks.length,
+      message: `Found ${tasks.length} task(s)`
+    }, null, 2);
+  } catch (error) {
+    throw new Error(`Failed to get tasks: ${error instanceof Error ? error.message : String(error)}`);
+  }
+}
+
+// src/tools/task-get-task.ts
+var taskGetTaskTool = {
+  name: "task_get_task",
+  description: "Get a task by ID",
+  inputSchema: {
+    type: "object",
+    properties: {
+      task_id: {
+        type: "string",
+        description: "Task ID to retrieve"
+      }
+    },
+    required: ["task_id"]
+  }
+};
+async function handleTaskGetTask(client, args) {
+  try {
+    const task = await client.getTask(args.task_id);
+    if (!task) {
+      throw new Error(`Task not found: ${args.task_id}`);
+    }
+    return JSON.stringify(task, null, 2);
+  } catch (error) {
+    throw new Error(`Failed to get task: ${error instanceof Error ? error.message : String(error)}`);
   }
 }
 
@@ -181,273 +270,220 @@ async function handleTaskDeleteTask(client, args) {
   }
 }
 
-// src/tools/task-get-status.ts
-var taskGetStatusTool = {
-  name: "task_get_status",
-  description: "Get current task status and progress",
-  inputSchema: {
-    type: "object",
-    properties: {
-      task_id: {
-        type: "string",
-        description: "Task ID to get status for"
-      }
-    },
-    required: ["task_id"]
-  }
-};
-async function handleTaskGetStatus(client, args) {
-  try {
-    const task = await client.getTask(args.task_id);
-    if (!task) {
-      throw new Error(`Task not found: ${args.task_id}`);
-    }
-    const currentMilestone = task.progress.milestones.find(
-      (m) => m.id === task.progress.current_milestone
-    );
-    let currentTaskItem = null;
-    if (task.progress.current_task && task.progress.current_milestone) {
-      const milestoneItems = task.progress.tasks[task.progress.current_milestone] || [];
-      currentTaskItem = milestoneItems.find(
-        (item) => item.id === task.progress.current_task
-      );
-    }
-    return JSON.stringify({
-      task_id: task.id,
-      task_title: task.title,
-      status: task.status,
-      overall_progress: task.progress.overall_percentage,
-      current_milestone: currentMilestone ? {
-        id: currentMilestone.id,
-        name: currentMilestone.name,
-        status: currentMilestone.status,
-        progress: currentMilestone.progress,
-        tasks_completed: currentMilestone.tasks_completed,
-        tasks_total: currentMilestone.tasks_total
-      } : null,
-      current_task: currentTaskItem ? {
-        id: currentTaskItem.id,
-        name: currentTaskItem.name,
-        status: currentTaskItem.status
-      } : null,
-      milestones_summary: {
-        total: task.progress.milestones.length,
-        completed: task.progress.milestones.filter((m) => m.status === "completed").length,
-        in_progress: task.progress.milestones.filter((m) => m.status === "in_progress").length
-      }
-    }, null, 2);
-  } catch (error) {
-    throw new Error(`Failed to get task status: ${error instanceof Error ? error.message : String(error)}`);
-  }
-}
+// src/tools/templates.ts
+var TASK_ITEM_TEMPLATE = `# Task {N}: {Descriptive Task Name}
 
-// src/tools/task-get-next-step.ts
-var taskGetNextStepTool = {
-  name: "task_get_next_step",
-  description: "Get instructions for the next step in the current task",
-  inputSchema: {
-    type: "object",
-    properties: {
-      task_id: {
-        type: "string",
-        description: "Task ID"
-      }
-    },
-    required: ["task_id"]
-  }
-};
-async function handleTaskGetNextStep(client, args) {
-  try {
-    const task = await client.getTask(args.task_id);
-    if (!task) {
-      throw new Error(`Task not found: ${args.task_id}`);
-    }
-    if (task.status === "paused") {
-      return JSON.stringify({
-        status: "paused",
-        message: "Task is paused. Resume the task to continue.",
-        instructions: null
-      }, null, 2);
-    }
-    if (task.status === "completed") {
-      return JSON.stringify({
-        status: "completed",
-        message: "Task is already completed.",
-        instructions: null
-      }, null, 2);
-    }
-    const currentMilestone = task.progress.milestones.find(
-      (m) => m.id === task.progress.current_milestone
-    );
-    if (!currentMilestone) {
-      return JSON.stringify({
-        status: "no_milestone",
-        message: "No current milestone. Create milestones to begin work.",
-        instructions: "Use task_create_milestone to add milestones to this task."
-      }, null, 2);
-    }
-    const milestoneItems = task.progress.tasks[task.progress.current_milestone] || [];
-    const currentTaskItem = milestoneItems.find(
-      (item) => item.id === task.progress.current_task
-    );
-    if (!currentTaskItem) {
-      const nextTask = milestoneItems.find(
-        (item) => item.status === "not_started" || item.status === "in_progress"
-      );
-      if (!nextTask) {
-        return JSON.stringify({
-          status: "milestone_complete",
-          message: `Milestone "${currentMilestone.name}" is complete.`,
-          instructions: "Move to the next milestone or complete the task.",
-          current_milestone: currentMilestone.name
-        }, null, 2);
-      }
-      return JSON.stringify({
-        status: "ready",
-        current_milestone: {
-          id: currentMilestone.id,
-          name: currentMilestone.name
-        },
-        next_task: {
-          id: nextTask.id,
-          name: nextTask.name,
-          description: nextTask.description,
-          status: nextTask.status,
-          estimated_hours: nextTask.estimated_hours
-        },
-        instructions: `Begin work on: ${nextTask.name}
+**Milestone**: M{N} - Milestone Name
+**Estimated Time**: [e.g., "2 hours", "4 hours", "1 day"]
+**Dependencies**: [List prerequisite tasks, or "None"]
+**Status**: Not Started | In Progress | Completed
 
-Description: ${nextTask.description}`
-      }, null, 2);
-    }
-    return JSON.stringify({
-      status: "in_progress",
-      current_milestone: {
-        id: currentMilestone.id,
-        name: currentMilestone.name,
-        progress: currentMilestone.progress
-      },
-      current_task: {
-        id: currentTaskItem.id,
-        name: currentTaskItem.name,
-        description: currentTaskItem.description,
-        status: currentTaskItem.status,
-        estimated_hours: currentTaskItem.estimated_hours,
-        notes: currentTaskItem.notes
-      },
-      instructions: `Continue work on: ${currentTaskItem.name}
+---
 
-Description: ${currentTaskItem.description}${currentTaskItem.notes ? `
+## Objective
 
-Notes: ${currentTaskItem.notes}` : ""}`
-    }, null, 2);
-  } catch (error) {
-    throw new Error(`Failed to get next step: ${error instanceof Error ? error.message : String(error)}`);
-  }
-}
+[Clearly state what this task accomplishes. Be specific and focused on a single, achievable goal.]
 
-// src/tools/task-update-progress.ts
-var taskUpdateProgressTool = {
-  name: "task_update_progress",
-  description: "Update the overall progress percentage for a task",
-  inputSchema: {
-    type: "object",
-    properties: {
-      task_id: {
-        type: "string",
-        description: "Task ID"
-      },
-      percentage: {
-        type: "number",
-        description: "Progress percentage (0-100)",
-        minimum: 0,
-        maximum: 100
-      }
-    },
-    required: ["task_id", "percentage"]
-  }
-};
-async function handleTaskUpdateProgress(client, args) {
-  try {
-    const percentage = Math.min(100, Math.max(0, args.percentage));
-    await client.updateOverallProgress(args.task_id, percentage);
-    return JSON.stringify({
-      success: true,
-      task_id: args.task_id,
-      progress: percentage,
-      message: `Progress updated to ${percentage}%`
-    }, null, 2);
-  } catch (error) {
-    throw new Error(`Failed to update progress: ${error instanceof Error ? error.message : String(error)}`);
-  }
-}
+---
 
-// src/tools/task-complete-task-item.ts
-var taskCompleteTaskItemTool = {
-  name: "task_complete_task_item",
-  description: "Mark a task item as complete",
-  inputSchema: {
-    type: "object",
-    properties: {
-      task_id: {
-        type: "string",
-        description: "Task ID"
-      },
-      milestone_id: {
-        type: "string",
-        description: "Milestone ID"
-      },
-      task_item_id: {
-        type: "string",
-        description: "Task item ID to complete"
-      }
-    },
-    required: ["task_id", "milestone_id", "task_item_id"]
-  }
-};
-async function handleTaskCompleteTaskItem(client, args) {
-  try {
-    await client.completeTaskItem(args.task_id, args.milestone_id, args.task_item_id);
-    const task = await client.getTask(args.task_id);
-    if (!task) {
-      throw new Error("Task not found after update");
-    }
-    const milestone = task.progress.milestones.find((m) => m.id === args.milestone_id);
-    const milestoneItems = task.progress.tasks[args.milestone_id] || [];
-    const completedCount = milestoneItems.filter((item) => item.status === "completed").length;
-    const milestoneProgress = milestone ? Math.round(completedCount / milestoneItems.length * 100) : 0;
-    if (milestone && milestone.progress !== milestoneProgress) {
-      await client.updateMilestone(args.task_id, args.milestone_id, {
-        progress: milestoneProgress,
-        tasks_completed: completedCount,
-        tasks_total: milestoneItems.length
-      });
-    }
-    const nextTask = milestoneItems.find(
-      (item) => item.status === "not_started" || item.status === "in_progress"
-    );
-    return JSON.stringify({
-      success: true,
-      task_id: args.task_id,
-      completed_task: args.task_item_id,
-      milestone_progress: milestoneProgress,
-      milestone_tasks_completed: completedCount,
-      milestone_tasks_total: milestoneItems.length,
-      next_task: nextTask ? {
-        id: nextTask.id,
-        name: nextTask.name
-      } : null,
-      message: nextTask ? `Task item completed. Next: ${nextTask.name}` : "Task item completed. Milestone complete!"
-    }, null, 2);
-  } catch (error) {
-    throw new Error(`Failed to complete task item: ${error instanceof Error ? error.message : String(error)}`);
-  }
-}
+## Context
+
+[Provide background information that helps understand why this task is necessary and how it fits into the larger milestone.]
+
+---
+
+## Steps
+
+### 1. [Step Category or Action]
+[Detailed description of what to do]
+
+### 2. [Next Step]
+[Detailed description]
+
+### 3. [Next Step]
+[Detailed description]
+
+---
+
+## Verification
+
+- [ ] Verification item 1: [Specific condition to check]
+- [ ] Verification item 2: [Specific condition to check]
+- [ ] Verification item 3: [Specific condition to check]
+
+---
+
+## Expected Output
+
+[Describe what should exist after this task is complete]
+
+**File Structure**:
+\`\`\`
+project-root/
+\u251C\u2500\u2500 file1
+\u251C\u2500\u2500 file2
+\u2514\u2500\u2500 directory/
+    \u2514\u2500\u2500 file3
+\`\`\`
+
+**Key Files Created**:
+- file1: [Purpose]
+- file2: [Purpose]
+
+---
+
+## Common Issues and Solutions
+
+### Issue 1: [Problem description]
+**Symptom**: [What the user will see]
+**Solution**: [How to fix it]
+
+### Issue 2: [Problem description]
+**Symptom**: [What the user will see]
+**Solution**: [How to fix it]
+
+---
+
+## Resources
+
+- [Resource 1 Name](URL): Description
+- [Resource 2 Name](URL): Description
+
+---
+
+## Notes
+
+- Note 1: [Important information]
+- Note 2: [Important information]
+
+---
+
+**Next Task**: task-{N+1}-{name}.md
+**Related Design Docs**: [Links to relevant design documents]
+**Estimated Completion Date**: [YYYY-MM-DD or "TBD"]
+`;
+var MILESTONE_TEMPLATE = `# Milestone {N}: {Descriptive Name}
+
+**Goal**: [One-line objective that clearly states what this milestone achieves]
+**Duration**: [Estimated time: e.g., "1-2 weeks", "3-5 days"]
+**Dependencies**: [List prerequisite milestones or "None"]
+**Status**: Not Started | In Progress | Completed
+
+---
+
+## Overview
+
+[Comprehensive description of what this milestone accomplishes and why it's important]
+
+---
+
+## Deliverables
+
+### 1. [Deliverable Category 1]
+- Specific item 1
+- Specific item 2
+
+### 2. [Deliverable Category 2]
+- Specific item 1
+- Specific item 2
+
+### 3. [Deliverable Category 3]
+- Specific item 1
+- Specific item 2
+
+---
+
+## Success Criteria
+
+- [ ] Criterion 1: [Specific, measurable condition]
+- [ ] Criterion 2: [Specific, measurable condition]
+- [ ] Criterion 3: [Specific, measurable condition]
+- [ ] Criterion 4: [Specific, measurable condition]
+- [ ] Criterion 5: [Specific, measurable condition]
+
+---
+
+## Key Files to Create
+
+\`\`\`
+project-root/
+\u251C\u2500\u2500 file1.ext
+\u251C\u2500\u2500 file2.ext
+\u251C\u2500\u2500 directory1/
+\u2502   \u251C\u2500\u2500 file3.ext
+\u2502   \u2514\u2500\u2500 file4.ext
+\u2514\u2500\u2500 directory2/
+    \u251C\u2500\u2500 subdirectory/
+    \u2502   \u2514\u2500\u2500 file5.ext
+    \u2514\u2500\u2500 file6.ext
+\`\`\`
+
+---
+
+## Tasks
+
+1. Task 1: task-N-{name}.md - [Brief description]
+2. Task 2: task-N-{name}.md - [Brief description]
+3. Task 3: task-N-{name}.md - [Brief description]
+4. Task 4: task-N-{name}.md - [Brief description]
+
+---
+
+## Environment Variables
+
+[If this milestone requires environment configuration:]
+
+\`\`\`env
+# Category 1
+VAR_NAME_1=example_value
+VAR_NAME_2=example_value
+
+# Category 2
+VAR_NAME_3=example_value
+\`\`\`
+
+---
+
+## Testing Requirements
+
+- [ ] Test category 1: [Description]
+- [ ] Test category 2: [Description]
+- [ ] Test category 3: [Description]
+
+---
+
+## Documentation Requirements
+
+- [ ] Document 1: [Description]
+- [ ] Document 2: [Description]
+- [ ] Document 3: [Description]
+
+---
+
+## Risks and Mitigation
+
+| Risk | Impact | Probability | Mitigation Strategy |
+|------|--------|-------------|---------------------|
+| [Risk 1] | High/Medium/Low | High/Medium/Low | [How to mitigate] |
+| [Risk 2] | High/Medium/Low | High/Medium/Low | [How to mitigate] |
+
+---
+
+**Next Milestone**: milestone-{N+1}-{name}.md
+**Blockers**: [List any current blockers, or "None"]
+**Notes**: [Any additional context or considerations]
+`;
 
 // src/tools/task-create-milestone.ts
 var taskCreateMilestoneTool = {
   name: "task_create_milestone",
-  description: "Create a new milestone in a task",
+  description: `Create a new milestone in a task.
+
+NOTE: Milestones correspond to ACP Milestones and should follow this structure:
+
+${MILESTONE_TEMPLATE}
+
+Use the 'description' parameter to provide the full milestone content following this structure.`,
   inputSchema: {
     type: "object",
     properties: {
@@ -498,10 +534,129 @@ async function handleTaskCreateMilestone(client, args) {
   }
 }
 
+// src/tools/task-get-milestone.ts
+var taskGetMilestoneTool = {
+  name: "task_get_milestone",
+  description: "Get a milestone by ID",
+  inputSchema: {
+    type: "object",
+    properties: {
+      task_id: {
+        type: "string",
+        description: "Task ID"
+      },
+      milestone_id: {
+        type: "string",
+        description: "Milestone ID to retrieve"
+      }
+    },
+    required: ["task_id", "milestone_id"]
+  }
+};
+async function handleTaskGetMilestone(client, args) {
+  try {
+    const task = await client.getTask(args.task_id);
+    if (!task) {
+      throw new Error(`Task not found: ${args.task_id}`);
+    }
+    const milestone = task.progress.milestones.find((m) => m.id === args.milestone_id);
+    if (!milestone) {
+      throw new Error(`Milestone not found: ${args.milestone_id}`);
+    }
+    return JSON.stringify(milestone, null, 2);
+  } catch (error) {
+    throw new Error(`Failed to get milestone: ${error instanceof Error ? error.message : String(error)}`);
+  }
+}
+
+// src/tools/task-update-milestone.ts
+var taskUpdateMilestoneTool = {
+  name: "task_update_milestone",
+  description: "Update milestone properties (status, progress, description, etc.)",
+  inputSchema: {
+    type: "object",
+    properties: {
+      task_id: {
+        type: "string",
+        description: "Task ID"
+      },
+      milestone_id: {
+        type: "string",
+        description: "Milestone ID to update"
+      },
+      status: {
+        type: "string",
+        enum: ["not_started", "in_progress", "completed"],
+        description: "New milestone status (optional)"
+      },
+      progress: {
+        type: "number",
+        minimum: 0,
+        maximum: 100,
+        description: "Progress percentage 0-100 (optional)"
+      },
+      description: {
+        type: "string",
+        description: "Updated description (optional)"
+      }
+    },
+    required: ["task_id", "milestone_id"]
+  }
+};
+async function handleTaskUpdateMilestone(client, args) {
+  try {
+    const task = await client.getTask(args.task_id);
+    if (!task) {
+      throw new Error(`Task not found: ${args.task_id}`);
+    }
+    const milestone = task.progress.milestones.find((m) => m.id === args.milestone_id);
+    if (!milestone) {
+      throw new Error(`Milestone not found: ${args.milestone_id}`);
+    }
+    const updates = {};
+    const changes = [];
+    if (args.status) {
+      updates.status = args.status;
+      changes.push(`status: ${milestone.status} \u2192 ${args.status}`);
+    }
+    if (args.progress !== void 0) {
+      updates.progress = args.progress;
+      changes.push(`progress: ${milestone.progress}% \u2192 ${args.progress}%`);
+    }
+    if (args.description) {
+      updates.description = args.description;
+      changes.push(`description updated`);
+    }
+    if (changes.length === 0) {
+      return JSON.stringify({
+        success: false,
+        message: "No updates specified. Provide at least one field to update."
+      }, null, 2);
+    }
+    await client.updateMilestone(args.task_id, args.milestone_id, updates);
+    return JSON.stringify({
+      success: true,
+      task_id: args.task_id,
+      milestone_id: args.milestone_id,
+      milestone_name: milestone.name,
+      updates: changes,
+      message: `Milestone "${milestone.name}" updated successfully`
+    }, null, 2);
+  } catch (error) {
+    throw new Error(`Failed to update milestone: ${error instanceof Error ? error.message : String(error)}`);
+  }
+}
+
 // src/tools/task-create-task-item.ts
 var taskCreateTaskItemTool = {
   name: "task_create_task_item",
-  description: "Create a new task item within a milestone",
+  description: `Create a new task item within a milestone.
+
+NOTE: Task items correspond to ACP Tasks and should follow this structure:
+
+${TASK_ITEM_TEMPLATE}
+
+Use the 'description' parameter to provide the full task content following this structure.`,
   inputSchema: {
     type: "object",
     properties: {
@@ -567,10 +722,10 @@ async function handleTaskCreateTaskItem(client, args) {
   }
 }
 
-// src/tools/task-report-completion.ts
-var taskReportCompletionTool = {
-  name: "task_report_completion",
-  description: "Report completion of a task item and get next instructions",
+// src/tools/task-get-task-item.ts
+var taskGetTaskItemTool = {
+  name: "task_get_task_item",
+  description: "Get a task item by ID",
   inputSchema: {
     type: "object",
     properties: {
@@ -584,47 +739,174 @@ var taskReportCompletionTool = {
       },
       task_item_id: {
         type: "string",
-        description: "Task item ID that was completed"
-      },
-      notes: {
-        type: "string",
-        description: "Optional notes about the completion"
+        description: "Task item ID to retrieve"
       }
     },
     required: ["task_id", "milestone_id", "task_item_id"]
   }
 };
-async function handleTaskReportCompletion(client, args) {
+async function handleTaskGetTaskItem(client, args) {
   try {
-    if (args.notes) {
-      await client.updateTaskItem(
-        args.task_id,
-        args.milestone_id,
-        args.task_item_id,
-        { notes: args.notes }
-      );
+    const task = await client.getTask(args.task_id);
+    if (!task) {
+      throw new Error(`Task not found: ${args.task_id}`);
     }
-    const completionResult = await handleTaskCompleteTaskItem(client, {
+    const milestone = task.progress.milestones.find((m) => m.id === args.milestone_id);
+    if (!milestone) {
+      throw new Error(`Milestone not found: ${args.milestone_id}`);
+    }
+    const milestoneItems = task.progress.tasks[args.milestone_id] || [];
+    const taskItem = milestoneItems.find((item) => item.id === args.task_item_id);
+    if (!taskItem) {
+      throw new Error(`Task item not found: ${args.task_item_id}`);
+    }
+    return JSON.stringify(taskItem, null, 2);
+  } catch (error) {
+    throw new Error(`Failed to get task item: ${error instanceof Error ? error.message : String(error)}`);
+  }
+}
+
+// src/tools/task-update-task-item.ts
+var taskUpdateTaskItemTool = {
+  name: "task_update_task_item",
+  description: "Update task item properties (status, description, estimated_hours)",
+  inputSchema: {
+    type: "object",
+    properties: {
+      task_id: {
+        type: "string",
+        description: "Task ID"
+      },
+      milestone_id: {
+        type: "string",
+        description: "Milestone ID"
+      },
+      task_item_id: {
+        type: "string",
+        description: "Task item ID to update"
+      },
+      status: {
+        type: "string",
+        enum: ["not_started", "in_progress", "completed"],
+        description: "New task item status (optional)"
+      },
+      description: {
+        type: "string",
+        description: "Updated description (optional)"
+      },
+      estimated_hours: {
+        type: "number",
+        minimum: 0,
+        description: "Estimated hours to complete (optional)"
+      }
+    },
+    required: ["task_id", "milestone_id", "task_item_id"]
+  }
+};
+async function handleTaskUpdateTaskItem(client, args) {
+  try {
+    const task = await client.getTask(args.task_id);
+    if (!task) {
+      throw new Error(`Task not found: ${args.task_id}`);
+    }
+    const milestone = task.progress.milestones.find((m) => m.id === args.milestone_id);
+    if (!milestone) {
+      throw new Error(`Milestone not found: ${args.milestone_id}`);
+    }
+    const milestoneItems = task.progress.tasks[args.milestone_id] || [];
+    const taskItem = milestoneItems.find((item) => item.id === args.task_item_id);
+    if (!taskItem) {
+      throw new Error(`Task item not found: ${args.task_item_id}`);
+    }
+    const updates = {};
+    const changes = [];
+    if (args.status) {
+      updates.status = args.status;
+      changes.push(`status: ${taskItem.status} \u2192 ${args.status}`);
+    }
+    if (args.description) {
+      updates.description = args.description;
+      changes.push(`description updated`);
+    }
+    if (args.estimated_hours !== void 0) {
+      updates.estimated_hours = args.estimated_hours;
+      changes.push(`estimated_hours: ${taskItem.estimated_hours || "none"} \u2192 ${args.estimated_hours}`);
+    }
+    if (changes.length === 0) {
+      return JSON.stringify({
+        success: false,
+        message: "No updates specified. Provide at least one field to update."
+      }, null, 2);
+    }
+    await client.updateTaskItem(args.task_id, args.milestone_id, args.task_item_id, updates);
+    let milestoneProgressUpdate = null;
+    if (args.status) {
+      const updatedTask = await client.getTask(args.task_id);
+      if (updatedTask) {
+        const updatedItems = updatedTask.progress.tasks[args.milestone_id] || [];
+        const completedCount = updatedItems.filter((item) => item.status === "completed").length;
+        const totalCount = updatedItems.length;
+        const newProgress = totalCount > 0 ? Math.round(completedCount / totalCount * 100) : 0;
+        await client.updateMilestone(args.task_id, args.milestone_id, {
+          progress: newProgress,
+          tasks_completed: completedCount,
+          status: completedCount === totalCount ? "completed" : completedCount > 0 ? "in_progress" : "not_started"
+        });
+        milestoneProgressUpdate = {
+          completed: completedCount,
+          total: totalCount,
+          progress: newProgress
+        };
+      }
+    }
+    return JSON.stringify({
+      success: true,
       task_id: args.task_id,
       milestone_id: args.milestone_id,
-      task_item_id: args.task_item_id
-    });
-    const nextStepResult = await handleTaskGetNextStep(client, {
-      task_id: args.task_id
-    });
-    const completion = JSON.parse(completionResult);
-    const nextStep = JSON.parse(nextStepResult);
-    return JSON.stringify({
-      completion: {
-        success: completion.success,
-        completed_task: completion.completed_task,
-        milestone_progress: completion.milestone_progress
-      },
-      next_step: nextStep,
-      message: completion.message
+      task_item_id: args.task_item_id,
+      task_item_name: taskItem.name,
+      updates: changes,
+      milestone_progress: milestoneProgressUpdate,
+      message: `Task item "${taskItem.name}" updated successfully`
     }, null, 2);
   } catch (error) {
-    throw new Error(`Failed to report completion: ${error instanceof Error ? error.message : String(error)}`);
+    throw new Error(`Failed to update task item: ${error instanceof Error ? error.message : String(error)}`);
+  }
+}
+
+// src/tools/task-update-progress.ts
+var taskUpdateProgressTool = {
+  name: "task_update_progress",
+  description: "Update the overall progress percentage for a task",
+  inputSchema: {
+    type: "object",
+    properties: {
+      task_id: {
+        type: "string",
+        description: "Task ID"
+      },
+      percentage: {
+        type: "number",
+        description: "Progress percentage (0-100)",
+        minimum: 0,
+        maximum: 100
+      }
+    },
+    required: ["task_id", "percentage"]
+  }
+};
+async function handleTaskUpdateProgress(client, args) {
+  try {
+    const percentage = Math.min(100, Math.max(0, args.percentage));
+    await client.updateOverallProgress(args.task_id, percentage);
+    return JSON.stringify({
+      success: true,
+      task_id: args.task_id,
+      progress: percentage,
+      message: `Progress updated to ${percentage}%`
+    }, null, 2);
+  } catch (error) {
+    throw new Error(`Failed to update progress: ${error instanceof Error ? error.message : String(error)}`);
   }
 }
 
@@ -678,29 +960,41 @@ async function handleTaskAddMessage(client, args) {
 
 // src/tools/index.ts
 var allTools = [
+  // Task CRUD (5 tools)
   taskCreateTaskTool,
+  taskGetTasksTool,
+  taskGetTaskTool,
   taskUpdateTaskTool,
   taskDeleteTaskTool,
-  taskGetStatusTool,
-  taskGetNextStepTool,
-  taskUpdateProgressTool,
-  taskCompleteTaskItemTool,
+  // Milestone CRU (3 tools - no delete, milestones are part of task)
   taskCreateMilestoneTool,
+  taskGetMilestoneTool,
+  taskUpdateMilestoneTool,
+  // Task Item CRU (3 tools - no delete, task items are part of milestone)
   taskCreateTaskItemTool,
-  taskReportCompletionTool,
+  taskGetTaskItemTool,
+  taskUpdateTaskItemTool,
+  // Progress & Communication (2 tools)
+  taskUpdateProgressTool,
   taskAddMessageTool
 ];
 var toolHandlers = {
+  // Task CRUD
   "task_create_task": handleTaskCreateTask,
+  "task_get_tasks": handleTaskGetTasks,
+  "task_get_task": handleTaskGetTask,
   "task_update_task": handleTaskUpdateTask,
   "task_delete_task": handleTaskDeleteTask,
-  "task_get_status": handleTaskGetStatus,
-  "task_get_next_step": handleTaskGetNextStep,
-  "task_update_progress": handleTaskUpdateProgress,
-  "task_complete_task_item": handleTaskCompleteTaskItem,
+  // Milestone CRU
   "task_create_milestone": handleTaskCreateMilestone,
+  "task_get_milestone": handleTaskGetMilestone,
+  "task_update_milestone": handleTaskUpdateMilestone,
+  // Task Item CRU
   "task_create_task_item": handleTaskCreateTaskItem,
-  "task_report_completion": handleTaskReportCompletion,
+  "task_get_task_item": handleTaskGetTaskItem,
+  "task_update_task_item": handleTaskUpdateTaskItem,
+  // Progress & Communication
+  "task_update_progress": handleTaskUpdateProgress,
   "task_add_message": handleTaskAddMessage
 };
 function getToolHandler(toolName) {

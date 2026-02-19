@@ -1,36 +1,34 @@
 /**
- * MCP Tool: task_create
+ * MCP Tool: task_task_item_get
  *
- * Create a new task with title, description, and optional configuration.
- * Returns the created task ID and initial status.
+ * Get a task item by ID from a milestone.
  */
 import { FirebaseClient } from '@prmichaelsen/task-core/client';
-export declare const taskCreateTool: {
+export declare const taskGetTaskItemTool: {
     name: string;
     description: string;
     inputSchema: {
         type: string;
         properties: {
-            title: {
+            task_id: {
                 type: string;
                 description: string;
             };
-            description: {
+            milestone_id: {
                 type: string;
                 description: string;
             };
-            auto_approve: {
+            task_item_id: {
                 type: string;
                 description: string;
-                default: boolean;
             };
         };
         required: string[];
     };
 };
-export declare function handleTaskCreate(client: FirebaseClient, args: {
-    title: string;
-    description: string;
-    auto_approve?: boolean;
+export declare function handleTaskGetTaskItem(client: FirebaseClient, args: {
+    task_id: string;
+    milestone_id: string;
+    task_item_id: string;
 }): Promise<string>;
-//# sourceMappingURL=task-create.d.ts.map
+//# sourceMappingURL=task-get-task-item.d.ts.map

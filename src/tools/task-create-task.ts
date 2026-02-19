@@ -10,7 +10,19 @@ import type { Task } from '@prmichaelsen/task-core/schemas'
 
 export const taskCreateTaskTool = {
   name: 'task_create_task',
-  description: 'Create a new task with title and description',
+  description: `Create a new task with title and description.
+
+NOTE: Tasks in this system correspond to ACP Projects. The task's progress structure follows the ACP progress.yaml format with:
+- Milestones (major phases)
+- Task Items (granular work items within milestones)
+- Progress tracking (percentages, status, completion dates)
+
+After creating a task, use:
+- task_create_milestone to add milestones
+- task_create_task_item to add task items to milestones
+- task_update_progress to track overall completion
+
+The progress structure matches agent/progress.yaml format but stored as Firestore objects.`,
   inputSchema: {
     type: 'object',
     properties: {
