@@ -3,6 +3,9 @@
  *
  * Exports all task management tools for the MCP server.
  */
+import { taskCreateTaskTool, handleTaskCreateTask } from './task-create-task.js';
+import { taskUpdateTaskTool, handleTaskUpdateTask } from './task-update-task.js';
+import { taskDeleteTaskTool, handleTaskDeleteTask } from './task-delete-task.js';
 import { taskGetStatusTool, handleTaskGetStatus } from './task-get-status.js';
 import { taskGetNextStepTool, handleTaskGetNextStep } from './task-get-next-step.js';
 import { taskUpdateProgressTool, handleTaskUpdateProgress } from './task-update-progress.js';
@@ -14,7 +17,29 @@ import { taskAddMessageTool, handleTaskAddMessage } from './task-add-message.js'
 /**
  * All tool definitions
  */
-export declare const allTools: {
+export declare const allTools: ({
+    name: string;
+    description: string;
+    inputSchema: {
+        type: string;
+        properties: {
+            title: {
+                type: string;
+                description: string;
+            };
+            description: {
+                type: string;
+                description: string;
+            };
+            auto_approve: {
+                type: string;
+                description: string;
+                default: boolean;
+            };
+        };
+        required: string[];
+    };
+} | {
     name: string;
     description: string;
     inputSchema: {
@@ -27,11 +52,14 @@ export declare const allTools: {
         };
         required: string[];
     };
-}[];
+})[];
 /**
  * Tool handlers mapped by tool name
  */
 export declare const toolHandlers: {
+    task_create_task: typeof handleTaskCreateTask;
+    task_update_task: typeof handleTaskUpdateTask;
+    task_delete_task: typeof handleTaskDeleteTask;
     task_get_status: typeof handleTaskGetStatus;
     task_get_next_step: typeof handleTaskGetNextStep;
     task_update_progress: typeof handleTaskUpdateProgress;
@@ -44,6 +72,6 @@ export declare const toolHandlers: {
 /**
  * Get tool handler by name
  */
-export declare function getToolHandler(toolName: string): typeof handleTaskCompleteTaskItem | typeof handleTaskGetNextStep | typeof handleTaskGetStatus | typeof handleTaskUpdateProgress | typeof handleTaskCreateMilestone | typeof handleTaskCreateTaskItem | typeof handleTaskReportCompletion | typeof handleTaskAddMessage;
-export { taskGetStatusTool, handleTaskGetStatus, taskGetNextStepTool, handleTaskGetNextStep, taskUpdateProgressTool, handleTaskUpdateProgress, taskCompleteTaskItemTool, handleTaskCompleteTaskItem, taskCreateMilestoneTool, handleTaskCreateMilestone, taskCreateTaskItemTool, handleTaskCreateTaskItem, taskReportCompletionTool, handleTaskReportCompletion, taskAddMessageTool, handleTaskAddMessage };
+export declare function getToolHandler(toolName: string): typeof handleTaskCompleteTaskItem | typeof handleTaskGetNextStep | typeof handleTaskCreateTask | typeof handleTaskUpdateTask | typeof handleTaskDeleteTask | typeof handleTaskGetStatus | typeof handleTaskUpdateProgress | typeof handleTaskCreateMilestone | typeof handleTaskCreateTaskItem | typeof handleTaskReportCompletion | typeof handleTaskAddMessage;
+export { taskCreateTaskTool, handleTaskCreateTask, taskUpdateTaskTool, handleTaskUpdateTask, taskDeleteTaskTool, handleTaskDeleteTask, taskGetStatusTool, handleTaskGetStatus, taskGetNextStepTool, handleTaskGetNextStep, taskUpdateProgressTool, handleTaskUpdateProgress, taskCompleteTaskItemTool, handleTaskCompleteTaskItem, taskCreateMilestoneTool, handleTaskCreateMilestone, taskCreateTaskItemTool, handleTaskCreateTaskItem, taskReportCompletionTool, handleTaskReportCompletion, taskAddMessageTool, handleTaskAddMessage };
 //# sourceMappingURL=index.d.ts.map

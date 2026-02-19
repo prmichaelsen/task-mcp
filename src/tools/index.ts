@@ -4,7 +4,9 @@
  * Exports all task management tools for the MCP server.
  */
 
-import { taskCreateTool, handleTaskCreate } from './task-create.js'
+import { taskCreateTaskTool, handleTaskCreateTask } from './task-create-task.js'
+import { taskUpdateTaskTool, handleTaskUpdateTask } from './task-update-task.js'
+import { taskDeleteTaskTool, handleTaskDeleteTask } from './task-delete-task.js'
 import { taskGetStatusTool, handleTaskGetStatus } from './task-get-status.js'
 import { taskGetNextStepTool, handleTaskGetNextStep } from './task-get-next-step.js'
 import { taskUpdateProgressTool, handleTaskUpdateProgress } from './task-update-progress.js'
@@ -18,7 +20,9 @@ import { taskAddMessageTool, handleTaskAddMessage } from './task-add-message.js'
  * All tool definitions
  */
 export const allTools = [
-  taskCreateTool,
+  taskCreateTaskTool,
+  taskUpdateTaskTool,
+  taskDeleteTaskTool,
   taskGetStatusTool,
   taskGetNextStepTool,
   taskUpdateProgressTool,
@@ -33,7 +37,9 @@ export const allTools = [
  * Tool handlers mapped by tool name
  */
 export const toolHandlers = {
-  'task_create': handleTaskCreate,
+  'task_create_task': handleTaskCreateTask,
+  'task_update_task': handleTaskUpdateTask,
+  'task_delete_task': handleTaskDeleteTask,
   'task_get_status': handleTaskGetStatus,
   'task_get_next_step': handleTaskGetNextStep,
   'task_update_progress': handleTaskUpdateProgress,
@@ -53,8 +59,12 @@ export function getToolHandler(toolName: string) {
 
 // Re-export individual tools for direct imports
 export {
-  taskCreateTool,
-  handleTaskCreate,
+  taskCreateTaskTool,
+  handleTaskCreateTask,
+  taskUpdateTaskTool,
+  handleTaskUpdateTask,
+  taskDeleteTaskTool,
+  handleTaskDeleteTask,
   taskGetStatusTool,
   handleTaskGetStatus,
   taskGetNextStepTool,

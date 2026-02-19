@@ -7,6 +7,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.2.0] - 2026-02-19
+
+### Added
+- **`task_update_task` tool** - Update task properties including status
+  - Currently supports status updates (not_started/in_progress/paused/completed/failed)
+  - Validates task exists before updating
+  - Returns list of changes made
+- **`task_delete_task` tool** - Delete tasks permanently
+  - Requires explicit confirmation flag to prevent accidental deletion
+  - Validates task exists before deletion
+  - Returns deleted task title for confirmation
+
+### Changed
+- **BREAKING**: Renamed `task_create` to `task_create_task` for consistency with other task operations
+  - Tool name: `task_create` → `task_create_task`
+  - Function: `handleTaskCreate` → `handleTaskCreateTask`
+  - All references updated in index and tests
+- Tool count increased from 9 to 11 tools
+- Updated tools index to register new tools
+
+### Fixed
+- Naming inconsistency: task operations now consistently use `task_*_task` pattern
+- Complete CRUD operations now available: Create, Read (get_status), Update, Delete
+
 ## [1.1.0] - 2026-02-19
 
 ### Added

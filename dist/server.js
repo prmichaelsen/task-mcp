@@ -15,6 +15,172 @@ import {
 } from "@modelcontextprotocol/sdk/types.js";
 import { FirebaseClient } from "@prmichaelsen/task-core/client";
 
+// src/tools/task-create-task.ts
+var taskCreateTaskTool = {
+  name: "task_create_task",
+  description: "Create a new task with title and description",
+  inputSchema: {
+    type: "object",
+    properties: {
+      title: {
+        type: "string",
+        description: "Task title (1-200 characters)"
+      },
+      description: {
+        type: "string",
+        description: "Task description (1-5000 characters)"
+      },
+      auto_approve: {
+        type: "boolean",
+        description: "Whether to auto-approve task steps (optional)",
+        default: false
+      }
+    },
+    required: ["title", "description"]
+  }
+};
+async function handleTaskCreateTask(client, args) {
+  try {
+    if (!args.title || args.title.trim().length === 0) {
+      throw new Error("Task title is required");
+    }
+    if (!args.description || args.description.trim().length === 0) {
+      throw new Error("Task description is required");
+    }
+    if (args.title.length > 200) {
+      throw new Error("Task title must be 200 characters or less");
+    }
+    if (args.description.length > 5e3) {
+      throw new Error("Task description must be 5000 characters or less");
+    }
+    const config = {
+      system_prompt: "You are an AI assistant helping to complete tasks using the Agent Context Protocol (ACP).",
+      auto_approve: args.auto_approve ?? false
+    };
+    const createdTask = await client.createTask(
+      args.title.trim(),
+      args.description.trim(),
+      config,
+      {}
+      // metadata
+    );
+    return JSON.stringify({
+      success: true,
+      task_id: createdTask.id,
+      task: {
+        id: createdTask.id,
+        title: createdTask.title,
+        description: createdTask.description,
+        status: createdTask.status,
+        created_at: createdTask.created_at
+      },
+      message: `Task "${createdTask.title}" created successfully`,
+      next_steps: [
+        "Use task_create_milestone to add milestones",
+        "Use task_create_task_item to add tasks to milestones",
+        "Use task_get_status to check task progress",
+        "Use task_get_next_step to begin work"
+      ]
+    }, null, 2);
+  } catch (error) {
+    throw new Error(`Failed to create task: ${error instanceof Error ? error.message : String(error)}`);
+  }
+}
+
+// src/tools/task-update-task.ts
+var taskUpdateTaskTool = {
+  name: "task_update_task",
+  description: "Update task properties (status, title, description, config)",
+  inputSchema: {
+    type: "object",
+    properties: {
+      task_id: {
+        type: "string",
+        description: "Task ID to update"
+      },
+      status: {
+        type: "string",
+        enum: ["not_started", "in_progress", "paused", "completed", "failed"],
+        description: "New task status (optional)"
+      }
+    },
+    required: ["task_id"]
+  }
+};
+async function handleTaskUpdateTask(client, args) {
+  try {
+    const task = await client.getTask(args.task_id);
+    if (!task) {
+      throw new Error(`Task not found: ${args.task_id}`);
+    }
+    const updates = [];
+    if (args.status) {
+      await client.updateTaskStatus(args.task_id, args.status);
+      updates.push(`status: ${task.status} \u2192 ${args.status}`);
+    }
+    if (updates.length === 0) {
+      return JSON.stringify({
+        success: false,
+        message: "No updates specified. Provide at least one field to update."
+      }, null, 2);
+    }
+    return JSON.stringify({
+      success: true,
+      task_id: args.task_id,
+      updates,
+      message: `Task updated successfully`
+    }, null, 2);
+  } catch (error) {
+    throw new Error(`Failed to update task: ${error instanceof Error ? error.message : String(error)}`);
+  }
+}
+
+// src/tools/task-delete-task.ts
+var taskDeleteTaskTool = {
+  name: "task_delete_task",
+  description: "Delete a task permanently (cannot be undone)",
+  inputSchema: {
+    type: "object",
+    properties: {
+      task_id: {
+        type: "string",
+        description: "Task ID to delete"
+      },
+      confirm: {
+        type: "boolean",
+        description: "Confirmation flag - must be true to delete",
+        default: false
+      }
+    },
+    required: ["task_id", "confirm"]
+  }
+};
+async function handleTaskDeleteTask(client, args) {
+  try {
+    if (!args.confirm) {
+      return JSON.stringify({
+        success: false,
+        message: "Deletion requires confirmation. Set confirm=true to proceed.",
+        warning: "This action cannot be undone"
+      }, null, 2);
+    }
+    const task = await client.getTask(args.task_id);
+    if (!task) {
+      throw new Error(`Task not found: ${args.task_id}`);
+    }
+    const taskTitle = task.title;
+    await client.deleteTask(args.task_id);
+    return JSON.stringify({
+      success: true,
+      task_id: args.task_id,
+      task_title: taskTitle,
+      message: `Task "${taskTitle}" deleted successfully`
+    }, null, 2);
+  } catch (error) {
+    throw new Error(`Failed to delete task: ${error instanceof Error ? error.message : String(error)}`);
+  }
+}
+
 // src/tools/task-get-status.ts
 var taskGetStatusTool = {
   name: "task_get_status",
@@ -512,6 +678,9 @@ async function handleTaskAddMessage(client, args) {
 
 // src/tools/index.ts
 var allTools = [
+  taskCreateTaskTool,
+  taskUpdateTaskTool,
+  taskDeleteTaskTool,
   taskGetStatusTool,
   taskGetNextStepTool,
   taskUpdateProgressTool,
@@ -522,6 +691,9 @@ var allTools = [
   taskAddMessageTool
 ];
 var toolHandlers = {
+  "task_create_task": handleTaskCreateTask,
+  "task_update_task": handleTaskUpdateTask,
+  "task_delete_task": handleTaskDeleteTask,
   "task_get_status": handleTaskGetStatus,
   "task_get_next_step": handleTaskGetNextStep,
   "task_update_progress": handleTaskUpdateProgress,

@@ -1,15 +1,15 @@
 /**
- * Tests for task_create tool
+ * Tests for task_create_task tool
  */
 
-import { handleTaskCreate, taskCreateTool } from './task-create.js'
+import { handleTaskCreateTask, taskCreateTaskTool } from './task-create-task.js'
 import { FirebaseClient } from '@prmichaelsen/task-core/client'
 import type { Task } from '@prmichaelsen/task-core/schemas'
 
 // Mock FirebaseClient
 jest.mock('@prmichaelsen/task-core/client')
 
-describe('task_create', () => {
+describe('task_create_task', () => {
   let mockClient: jest.Mocked<FirebaseClient>
   
   beforeEach(() => {
@@ -20,21 +20,21 @@ describe('task_create', () => {
   
   describe('Tool Definition', () => {
     it('should have correct name', () => {
-      expect(taskCreateTool.name).toBe('task_create')
+      expect(taskCreateTaskTool.name).toBe('task_create_task')
     })
     
     it('should have description', () => {
-      expect(taskCreateTool.description).toBeTruthy()
+      expect(taskCreateTaskTool.description).toBeTruthy()
     })
     
     it('should require title and description parameters', () => {
-      expect(taskCreateTool.inputSchema.required).toContain('title')
-      expect(taskCreateTool.inputSchema.required).toContain('description')
+      expect(taskCreateTaskTool.inputSchema.required).toContain('title')
+      expect(taskCreateTaskTool.inputSchema.required).toContain('description')
     })
     
     it('should have auto_approve as optional parameter', () => {
-      expect(taskCreateTool.inputSchema.properties.auto_approve).toBeDefined()
-      expect(taskCreateTool.inputSchema.required).not.toContain('auto_approve')
+      expect(taskCreateTaskTool.inputSchema.properties.auto_approve).toBeDefined()
+      expect(taskCreateTaskTool.inputSchema.required).not.toContain('auto_approve')
     })
   })
   
@@ -69,7 +69,7 @@ describe('task_create', () => {
       
       mockClient.createTask.mockResolvedValue(mockTask)
       
-      const result = await handleTaskCreate(mockClient, {
+      const result = await handleTaskCreateTask(mockClient, {
         title: 'New Task',
         description: 'Task description'
       })
@@ -116,7 +116,7 @@ describe('task_create', () => {
       
       mockClient.createTask.mockResolvedValue(mockTask)
       
-      await handleTaskCreate(mockClient, {
+      await handleTaskCreateTask(mockClient, {
         title: 'Auto Task',
         description: 'Auto approved task',
         auto_approve: true
@@ -162,7 +162,7 @@ describe('task_create', () => {
       
       mockClient.createTask.mockResolvedValue(mockTask)
       
-      await handleTaskCreate(mockClient, {
+      await handleTaskCreateTask(mockClient, {
         title: '  Trimmed Task  ',
         description: '  Trimmed description  '
       })
@@ -177,7 +177,7 @@ describe('task_create', () => {
     
     it('should throw error if title is empty', async () => {
       await expect(
-        handleTaskCreate(mockClient, {
+        handleTaskCreateTask(mockClient, {
           title: '',
           description: 'Valid description'
         })
@@ -186,7 +186,7 @@ describe('task_create', () => {
     
     it('should throw error if title is only whitespace', async () => {
       await expect(
-        handleTaskCreate(mockClient, {
+        handleTaskCreateTask(mockClient, {
           title: '   ',
           description: 'Valid description'
         })
@@ -195,7 +195,7 @@ describe('task_create', () => {
     
     it('should throw error if description is empty', async () => {
       await expect(
-        handleTaskCreate(mockClient, {
+        handleTaskCreateTask(mockClient, {
           title: 'Valid title',
           description: ''
         })
@@ -204,7 +204,7 @@ describe('task_create', () => {
     
     it('should throw error if description is only whitespace', async () => {
       await expect(
-        handleTaskCreate(mockClient, {
+        handleTaskCreateTask(mockClient, {
           title: 'Valid title',
           description: '   '
         })
@@ -215,7 +215,7 @@ describe('task_create', () => {
       const longTitle = 'a'.repeat(201)
       
       await expect(
-        handleTaskCreate(mockClient, {
+        handleTaskCreateTask(mockClient, {
           title: longTitle,
           description: 'Valid description'
         })
@@ -226,7 +226,7 @@ describe('task_create', () => {
       const longDescription = 'a'.repeat(5001)
       
       await expect(
-        handleTaskCreate(mockClient, {
+        handleTaskCreateTask(mockClient, {
           title: 'Valid title',
           description: longDescription
         })
@@ -237,7 +237,7 @@ describe('task_create', () => {
       mockClient.createTask.mockRejectedValue(new Error('Firestore error'))
       
       await expect(
-        handleTaskCreate(mockClient, {
+        handleTaskCreateTask(mockClient, {
           title: 'Valid title',
           description: 'Valid description'
         })

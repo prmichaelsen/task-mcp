@@ -1,5 +1,5 @@
 /**
- * MCP Tool: task_create
+ * MCP Tool: task_create_task
  *
  * Create a new task with title, description, and optional configuration.
  * Returns the created task ID and initial status.
@@ -8,8 +8,8 @@
 import { FirebaseClient } from '@prmichaelsen/task-core/client'
 import type { Task } from '@prmichaelsen/task-core/schemas'
 
-export const taskCreateTool = {
-  name: 'task_create',
+export const taskCreateTaskTool = {
+  name: 'task_create_task',
   description: 'Create a new task with title and description',
   inputSchema: {
     type: 'object',
@@ -32,7 +32,7 @@ export const taskCreateTool = {
   }
 }
 
-export async function handleTaskCreate(
+export async function handleTaskCreateTask(
   client: FirebaseClient,
   args: {
     title: string
