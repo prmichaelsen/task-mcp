@@ -18,6 +18,58 @@ describe('task_create_task', () => {
     } as any
   })
   
+  const createMockTask = (title: string, autoApprove: boolean = false): Task => ({
+    id: 'task-123',
+    user_id: 'user-456',
+    title,
+    description: 'Task description',
+    status: 'not_started',
+    created_at: '2026-02-19T00:00:00Z',
+    updated_at: '2026-02-19T00:00:00Z',
+    machine_id: 'test-machine',
+    working_directory: '/test/path',
+    progress: {
+      project: {
+        name: 'Test',
+        version: '1.0.0',
+        started: '2026-02-19',
+        status: 'not_started' as const,
+        current_milestone: '',
+        description: 'Test'
+      },
+      milestones: [],
+      tasks: {},
+      documentation: {
+        design_documents: 0,
+        milestone_documents: 0,
+        pattern_documents: 0,
+        task_documents: 0,
+        last_updated: '2026-02-19'
+      },
+      progress: {
+        planning: 0,
+        implementation: 0,
+        testing: 0,
+        documentation: 0,
+        overall: 0
+      },
+      recent_work: [],
+      next_steps: [],
+      notes: [],
+      current_blockers: []
+    },
+    execution: {
+      api_messages: [],
+      task_messages: [],
+      tool_results: []
+    },
+    config: {
+      system_prompt: 'You are an AI assistant helping to complete tasks using the Agent Context Protocol (ACP).',
+      auto_approve: autoApprove
+    },
+    metadata: {}
+  })
+  
   describe('Tool Definition', () => {
     it('should have correct name', () => {
       expect(taskCreateTaskTool.name).toBe('task_create_task')
@@ -27,9 +79,10 @@ describe('task_create_task', () => {
       expect(taskCreateTaskTool.description).toBeTruthy()
     })
     
-    it('should require title and description parameters', () => {
+    it('should require title, description, and working_directory parameters', () => {
       expect(taskCreateTaskTool.inputSchema.required).toContain('title')
       expect(taskCreateTaskTool.inputSchema.required).toContain('description')
+      expect(taskCreateTaskTool.inputSchema.required).toContain('working_directory')
     })
     
     it('should have auto_approve as optional parameter', () => {
@@ -40,38 +93,13 @@ describe('task_create_task', () => {
   
   describe('Handler', () => {
     it('should create task with valid inputs', async () => {
-      const mockTask: Task = {
-        id: 'task-123',
-        user_id: 'user-456',
-        title: 'New Task',
-        description: 'Task description',
-        status: 'not_started',
-        created_at: '2026-02-19T00:00:00Z',
-        updated_at: '2026-02-19T00:00:00Z',
-        progress: {
-          current_milestone: '',
-          current_task: '',
-          overall_percentage: 0,
-          milestones: [],
-          tasks: {}
-        },
-        execution: {
-          api_messages: [],
-          task_messages: [],
-          tool_results: []
-        },
-        config: {
-          system_prompt: 'You are an AI assistant helping to complete tasks using the Agent Context Protocol (ACP).',
-          auto_approve: false
-        },
-        metadata: {}
-      }
-      
+      const mockTask = createMockTask('New Task')
       mockClient.createTask.mockResolvedValue(mockTask)
       
       const result = await handleTaskCreateTask(mockClient, {
         title: 'New Task',
-        description: 'Task description'
+        description: 'Task description',
+        working_directory: '/test/path'
       })
       
       const parsed = JSON.parse(result)
@@ -87,44 +115,20 @@ describe('task_create_task', () => {
     })
     
     it('should create task with auto_approve enabled', async () => {
-      const mockTask: Task = {
-        id: 'task-123',
-        user_id: 'user-456',
-        title: 'Auto Task',
-        description: 'Auto approved task',
-        status: 'not_started',
-        created_at: '2026-02-19T00:00:00Z',
-        updated_at: '2026-02-19T00:00:00Z',
-        progress: {
-          current_milestone: '',
-          current_task: '',
-          overall_percentage: 0,
-          milestones: [],
-          tasks: {}
-        },
-        execution: {
-          api_messages: [],
-          task_messages: [],
-          tool_results: []
-        },
-        config: {
-          system_prompt: 'You are an AI assistant helping to complete tasks using the Agent Context Protocol (ACP).',
-          auto_approve: true
-        },
-        metadata: {}
-      }
-      
+      const mockTask = createMockTask('Auto Task', true)
       mockClient.createTask.mockResolvedValue(mockTask)
       
       await handleTaskCreateTask(mockClient, {
         title: 'Auto Task',
         description: 'Auto approved task',
+        working_directory: '/test/path',
         auto_approve: true
       })
       
       expect(mockClient.createTask).toHaveBeenCalledWith(
         'Auto Task',
         'Auto approved task',
+        '/test/path',
         expect.objectContaining({
           auto_approve: true
         }),
@@ -133,43 +137,19 @@ describe('task_create_task', () => {
     })
     
     it('should trim whitespace from title and description', async () => {
-      const mockTask: Task = {
-        id: 'task-123',
-        user_id: 'user-456',
-        title: 'Trimmed Task',
-        description: 'Trimmed description',
-        status: 'not_started',
-        created_at: '2026-02-19T00:00:00Z',
-        updated_at: '2026-02-19T00:00:00Z',
-        progress: {
-          current_milestone: '',
-          current_task: '',
-          overall_percentage: 0,
-          milestones: [],
-          tasks: {}
-        },
-        execution: {
-          api_messages: [],
-          task_messages: [],
-          tool_results: []
-        },
-        config: {
-          system_prompt: 'You are an AI assistant helping to complete tasks using the Agent Context Protocol (ACP).',
-          auto_approve: false
-        },
-        metadata: {}
-      }
-      
+      const mockTask = createMockTask('Trimmed Task')
       mockClient.createTask.mockResolvedValue(mockTask)
       
       await handleTaskCreateTask(mockClient, {
         title: '  Trimmed Task  ',
-        description: '  Trimmed description  '
+        description: '  Trimmed description  ',
+        working_directory: '/test/path'
       })
       
       expect(mockClient.createTask).toHaveBeenCalledWith(
         'Trimmed Task',
         'Trimmed description',
+        '/test/path',
         expect.any(Object),
         {}
       )
@@ -179,7 +159,8 @@ describe('task_create_task', () => {
       await expect(
         handleTaskCreateTask(mockClient, {
           title: '',
-          description: 'Valid description'
+          description: 'Valid description',
+          working_directory: '/test/path'
         })
       ).rejects.toThrow('Task title is required')
     })
@@ -188,7 +169,8 @@ describe('task_create_task', () => {
       await expect(
         handleTaskCreateTask(mockClient, {
           title: '   ',
-          description: 'Valid description'
+          description: 'Valid description',
+          working_directory: '/test/path'
         })
       ).rejects.toThrow('Task title is required')
     })
@@ -197,7 +179,8 @@ describe('task_create_task', () => {
       await expect(
         handleTaskCreateTask(mockClient, {
           title: 'Valid title',
-          description: ''
+          description: '',
+          working_directory: '/test/path'
         })
       ).rejects.toThrow('Task description is required')
     })
@@ -206,7 +189,8 @@ describe('task_create_task', () => {
       await expect(
         handleTaskCreateTask(mockClient, {
           title: 'Valid title',
-          description: '   '
+          description: '   ',
+          working_directory: '/test/path'
         })
       ).rejects.toThrow('Task description is required')
     })
@@ -217,7 +201,8 @@ describe('task_create_task', () => {
       await expect(
         handleTaskCreateTask(mockClient, {
           title: longTitle,
-          description: 'Valid description'
+          description: 'Valid description',
+          working_directory: '/test/path'
         })
       ).rejects.toThrow('Task title must be 200 characters or less')
     })
@@ -228,7 +213,8 @@ describe('task_create_task', () => {
       await expect(
         handleTaskCreateTask(mockClient, {
           title: 'Valid title',
-          description: longDescription
+          description: longDescription,
+          working_directory: '/test/path'
         })
       ).rejects.toThrow('Task description must be 5000 characters or less')
     })
@@ -239,7 +225,8 @@ describe('task_create_task', () => {
       await expect(
         handleTaskCreateTask(mockClient, {
           title: 'Valid title',
-          description: 'Valid description'
+          description: 'Valid description',
+          working_directory: '/test/path'
         })
       ).rejects.toThrow('Failed to create task: Firestore error')
     })

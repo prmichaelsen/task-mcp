@@ -19,6 +19,10 @@ export declare const taskCreateTaskTool: {
                 type: string;
                 description: string;
             };
+            working_directory: {
+                type: string;
+                description: string;
+            };
             auto_approve: {
                 type: string;
                 description: string;
@@ -31,6 +35,7 @@ export declare const taskCreateTaskTool: {
 export declare function handleTaskCreateTask(client: FirebaseClient, args: {
     title: string;
     description: string;
+    working_directory: string;
     auto_approve?: boolean;
 }): Promise<string>;
 //# sourceMappingURL=task-create-task.d.ts.map

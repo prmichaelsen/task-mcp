@@ -50,8 +50,8 @@ export async function handleTaskGetTasks(
         status: t.status,
         created_at: t.created_at,
         updated_at: t.updated_at,
-        overall_progress: t.progress.overall_percentage,
-        current_milestone: t.progress.current_milestone,
+        overall_progress: t.progress.progress.overall,
+        current_milestone: t.progress.project.current_milestone,
         milestones_count: t.progress.milestones.length
       })),
       count: tasks.length,

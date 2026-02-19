@@ -34,13 +34,17 @@ The progress structure matches agent/progress.yaml format but stored as Firestor
         type: 'string',
         description: 'Task description (1-5000 characters)'
       },
+      working_directory: {
+        type: 'string',
+        description: 'Working directory path for task execution'
+      },
       auto_approve: {
         type: 'boolean',
         description: 'Whether to auto-approve task steps (optional)',
         default: false
       }
     },
-    required: ['title', 'description']
+    required: ['title', 'description', 'working_directory']
   }
 }
 
@@ -49,6 +53,7 @@ export async function handleTaskCreateTask(
   args: {
     title: string
     description: string
+    working_directory: string
     auto_approve?: boolean
   }
 ): Promise<string> {
@@ -80,6 +85,7 @@ export async function handleTaskCreateTask(
     const createdTask = await client.createTask(
       args.title.trim(),
       args.description.trim(),
+      args.working_directory,
       config,
       {} // metadata
     )

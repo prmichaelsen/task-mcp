@@ -1,11 +1,11 @@
 /**
- * MCP Tool: task_report_completion
+ * MCP Tool: task_delete_milestone
  *
- * Agent reports completion of a task item and gets next instructions.
- * This is a convenience tool that combines completing a task item and getting the next step.
+ * Delete a milestone and all its task items from a task.
+ * This action cannot be undone.
  */
 import { FirebaseClient } from '@prmichaelsen/task-core/client';
-export declare const taskReportCompletionTool: {
+export declare const taskDeleteMilestoneTool: {
     name: string;
     description: string;
     inputSchema: {
@@ -19,22 +19,18 @@ export declare const taskReportCompletionTool: {
                 type: string;
                 description: string;
             };
-            task_item_id: {
+            confirm: {
                 type: string;
                 description: string;
-            };
-            notes: {
-                type: string;
-                description: string;
+                default: boolean;
             };
         };
         required: string[];
     };
 };
-export declare function handleTaskReportCompletion(client: FirebaseClient, args: {
+export declare function handleTaskDeleteMilestone(client: FirebaseClient, args: {
     task_id: string;
     milestone_id: string;
-    task_item_id: string;
-    notes?: string;
+    confirm: boolean;
 }): Promise<string>;
-//# sourceMappingURL=task-report-completion.d.ts.map
+//# sourceMappingURL=task-delete-milestone.d.ts.map

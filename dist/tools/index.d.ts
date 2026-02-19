@@ -37,6 +37,10 @@ export declare const allTools: ({
                 type: string;
                 description: string;
             };
+            working_directory: {
+                type: string;
+                description: string;
+            };
             auto_approve: {
                 type: string;
                 description: string;

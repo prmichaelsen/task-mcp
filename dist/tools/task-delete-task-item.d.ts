@@ -1,10 +1,11 @@
 /**
- * MCP Tool: task_complete_task_item
+ * MCP Tool: task_delete_task_item
  *
- * Mark a task item as complete and update milestone progress.
+ * Delete a task item from a milestone.
+ * This action cannot be undone.
  */
 import { FirebaseClient } from '@prmichaelsen/task-core/client';
-export declare const taskCompleteTaskItemTool: {
+export declare const taskDeleteTaskItemTool: {
     name: string;
     description: string;
     inputSchema: {
@@ -22,13 +23,19 @@ export declare const taskCompleteTaskItemTool: {
                 type: string;
                 description: string;
             };
+            confirm: {
+                type: string;
+                description: string;
+                default: boolean;
+            };
         };
         required: string[];
     };
 };
-export declare function handleTaskCompleteTaskItem(client: FirebaseClient, args: {
+export declare function handleTaskDeleteTaskItem(client: FirebaseClient, args: {
     task_id: string;
     milestone_id: string;
     task_item_id: string;
+    confirm: boolean;
 }): Promise<string>;
-//# sourceMappingURL=task-complete-task-item.d.ts.map
+//# sourceMappingURL=task-delete-task-item.d.ts.map

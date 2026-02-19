@@ -37,13 +37,17 @@ The progress structure matches agent/progress.yaml format but stored as Firestor
         type: "string",
         description: "Task description (1-5000 characters)"
       },
+      working_directory: {
+        type: "string",
+        description: "Working directory path for task execution"
+      },
       auto_approve: {
         type: "boolean",
         description: "Whether to auto-approve task steps (optional)",
         default: false
       }
     },
-    required: ["title", "description"]
+    required: ["title", "description", "working_directory"]
   }
 };
 async function handleTaskCreateTask(client, args) {
@@ -67,6 +71,7 @@ async function handleTaskCreateTask(client, args) {
     const createdTask = await client.createTask(
       args.title.trim(),
       args.description.trim(),
+      args.working_directory,
       config,
       {}
       // metadata
@@ -132,8 +137,8 @@ async function handleTaskGetTasks(client, args) {
         status: t.status,
         created_at: t.created_at,
         updated_at: t.updated_at,
-        overall_progress: t.progress.overall_percentage,
-        current_milestone: t.progress.current_milestone,
+        overall_progress: t.progress.progress.overall,
+        current_milestone: t.progress.project.current_milestone,
         milestones_count: t.progress.milestones.length
       })),
       count: tasks.length,

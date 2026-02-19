@@ -79,28 +79,53 @@ describe('MCP Tools', () => {
         status: 'in_progress',
         created_at: '2026-02-16T00:00:00Z',
         updated_at: '2026-02-16T00:00:00Z',
+        machine_id: 'test-machine',
+        working_directory: '/test/path',
         progress: {
-          current_milestone: 'milestone-1',
-          current_task: '',
-          overall_percentage: 0,
+          project: {
+            name: 'Test',
+            version: '1.0.0',
+            started: '2026-02-19',
+            status: 'in_progress' as const,
+            current_milestone: 'milestone-1',
+            description: 'Test'
+          },
           milestones: [{
             id: 'milestone-1',
             name: 'Milestone 1',
             description: 'Test',
-            status: 'in_progress',
+            status: 'in_progress' as const,
             progress: 0,
             tasks_completed: 0,
             tasks_total: 0
           }],
           tasks: {
             'milestone-1': [
-              { id: 'task-1', name: 'Task 1', description: 'Test', status: 'not_started' }
+              { id: 'task-1', name: 'Task 1', description: 'Test', status: 'not_started' as const }
             ]
-          }
+          },
+          documentation: {
+            design_documents: 0,
+            milestone_documents: 0,
+            pattern_documents: 0,
+            task_documents: 0,
+            last_updated: '2026-02-19'
+          },
+          progress: {
+            planning: 0,
+            implementation: 0,
+            testing: 0,
+            documentation: 0,
+            overall: 0
+          },
+          recent_work: [],
+          next_steps: [],
+          notes: [],
+          current_blockers: []
         },
         execution: { api_messages: [], task_messages: [], tool_results: [] },
         config: { system_prompt: '', auto_approve: true },
-        metadata: undefined
+        metadata: {}
       }
       
       mockClient.createTaskItem.mockResolvedValue(undefined)
