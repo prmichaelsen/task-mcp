@@ -1,9 +1,10 @@
 /**
  * MCP Tools Index
- * 
+ *
  * Exports all task management tools for the MCP server.
  */
 
+import { taskCreateTool, handleTaskCreate } from './task-create.js'
 import { taskGetStatusTool, handleTaskGetStatus } from './task-get-status.js'
 import { taskGetNextStepTool, handleTaskGetNextStep } from './task-get-next-step.js'
 import { taskUpdateProgressTool, handleTaskUpdateProgress } from './task-update-progress.js'
@@ -17,6 +18,7 @@ import { taskAddMessageTool, handleTaskAddMessage } from './task-add-message.js'
  * All tool definitions
  */
 export const allTools = [
+  taskCreateTool,
   taskGetStatusTool,
   taskGetNextStepTool,
   taskUpdateProgressTool,
@@ -31,6 +33,7 @@ export const allTools = [
  * Tool handlers mapped by tool name
  */
 export const toolHandlers = {
+  'task_create': handleTaskCreate,
   'task_get_status': handleTaskGetStatus,
   'task_get_next_step': handleTaskGetNextStep,
   'task_update_progress': handleTaskUpdateProgress,
@@ -50,6 +53,8 @@ export function getToolHandler(toolName: string) {
 
 // Re-export individual tools for direct imports
 export {
+  taskCreateTool,
+  handleTaskCreate,
   taskGetStatusTool,
   handleTaskGetStatus,
   taskGetNextStepTool,

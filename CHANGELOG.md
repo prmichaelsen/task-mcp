@@ -7,6 +7,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.1.0] - 2026-02-19
+
+### Added
+- **`task_create` tool** - Agents can now create new tasks programmatically through MCP interface
+  - Accepts title (1-200 chars) and description (1-5000 chars)
+  - Optional `auto_approve` configuration
+  - Input validation with clear error messages
+  - Returns task ID and next steps guidance
+  - Enables fully autonomous task workflows
+- Comprehensive test suite for `task_create` tool (14 tests, 100% coverage)
+
+### Changed
+- Updated tools registry to include `task_create` (now 9 tools total)
+- Improved overall test coverage from 77.37% to 78.63%
+
+### Fixed
+- Critical gap: Agents previously could not create tasks through MCP, only work with existing tasks
+
 ## [1.0.0] - 2026-02-19
 
 ### Changed

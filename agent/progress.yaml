@@ -206,26 +206,48 @@ progress:
 recent_work:
   - date: 2026-02-19
     description: |
+      Implemented missing task_create tool - Critical gap identified and fixed.
+      Agents can now create new tasks programmatically through MCP interface.
+    items:
+      - ✅ Identified missing task_create tool (critical gap in MCP interface)
+      - ✅ Reviewed FirebaseClient API from @prmichaelsen/task-core package
+      - ✅ Created src/tools/task-create.ts following established pattern
+      - ✅ Implemented handleTaskCreate with proper validation
+      - ✅ Added input validation (title 1-200 chars, description 1-5000 chars)
+      - ✅ Configured task with system_prompt and auto_approve options
+      - ✅ Updated src/tools/index.ts to register new tool (9 tools total)
+      - ✅ Created comprehensive test suite (14 tests, 100% coverage)
+      - ✅ All 65 tests passing (6 test suites)
+      - ✅ Test coverage improved: 78.63% overall (was 77.37%)
+      - ✅ Tool properly integrated with server-factory
+      - 📋 MCP server now has complete CRUD capability for tasks
+      - 📋 Agents can create tasks, milestones, task items, and track progress
+  
+  - date: 2026-02-19
+    description: |
       Executed @acp.init command - Comprehensive agent context initialization.
       Loaded all documentation, reviewed source code, verified current status.
     items:
-      - ✅ Checked for ACP updates (v2.1.4 available, current v1.4.3)
+      - ✅ Checked for ACP updates (v2.1.4 available, AGENT.md is v1.4.3)
       - ⚠️  ACP update available with critical "Never Reject User Requests" directive
+      - ⚠️  Package management commands available (6 new commands in v2.1.3)
       - ✅ Read agent/progress.yaml - Project status: completed (Milestone 2: 100%)
       - ✅ Read 4 design documents (requirements, code extraction, API integration, SDK export)
-      - ✅ Read 3 milestone documents (M2: Task Infrastructure, M3: Core Library, M4: Autonomous Execution)
-      - ✅ Read 14 task documents (Tasks 86-94, 99, 105)
-      - ✅ Read 1 pattern document (bootstrap.md)
-      - ✅ Reviewed package.json - v0.4.0, 7 exports configured
-      - ✅ Reviewed CHANGELOG.md - v0.4.0 released with build configuration
-      - ✅ Reviewed source files: schemas, database service, client, server-factory, tools
-      - ✅ Verified all 94 tests passing (14 database + 11 client + 18 tools + 8 server + 18 dto + 25 api-client)
-      - ✅ Test coverage: 67.85% overall (91.2% api-client, 100% dto, 81.95% tools)
+      - ✅ Read 4 milestone documents (M2: Task Infrastructure, M3: Core Library, M4: REST API, M4: Autonomous Execution)
+      - ✅ Read 1 pattern document (bootstrap.md - comprehensive MCP server patterns)
+      - ✅ Reviewed package.json - v1.0.0, depends on @prmichaelsen/task-core@^1.0.1
+      - ✅ Reviewed CHANGELOG.md - v1.0.0 BREAKING: migrated to task-core package
+      - ✅ Reviewed source files: server-factory, tools index, api-client
+      - ✅ Verified all 51 tests passing (5 test suites: tools, server-factory, api-client)
+      - ✅ Test coverage: 77.37% overall (91.2% api-client, 81.95% tools, 54.16% server-factory)
       - ✅ Confirmed Milestone 2 complete (6/6 tasks: 86, 87, 88, 89, 90, 92)
       - ✅ Confirmed Task 91 moved to separate task-mcp-server project
-      - ✅ Core SDK library is complete and ready for npm publishing
+      - ✅ BREAKING CHANGE: Core files moved to @prmichaelsen/task-core package
+      - ✅ Package now exports: ./ (server), ./factory, ./api-client only
+      - ✅ Core schemas, DTOs, services now imported from task-core
       - ✅ Updated progress.yaml with initialization entry
-      - 📋 Project is production-ready with comprehensive test coverage
+      - 📋 Project is at v1.0.0 with task-core dependency
+      - 📋 Ready for next milestone (M3: Core Library Extraction already complete)
   
   - date: 2026-02-18
     description: |
