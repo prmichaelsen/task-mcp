@@ -206,22 +206,26 @@ progress:
 recent_work:
   - date: 2026-02-19
     description: |
-      Implemented missing task_create tool - Critical gap identified and fixed.
-      Agents can now create new tasks programmatically through MCP interface.
+      Complete API redesign to v2.0.0 with consistent CRUD operations and task-core v1.0.3 schema migration.
+      Major breaking changes for consistency and completeness.
     items:
-      - ✅ Identified missing task_create tool (critical gap in MCP interface)
-      - ✅ Reviewed FirebaseClient API from @prmichaelsen/task-core package
-      - ✅ Created src/tools/task-create.ts following established pattern
-      - ✅ Implemented handleTaskCreate with proper validation
-      - ✅ Added input validation (title 1-200 chars, description 1-5000 chars)
-      - ✅ Configured task with system_prompt and auto_approve options
-      - ✅ Updated src/tools/index.ts to register new tool (9 tools total)
-      - ✅ Created comprehensive test suite (14 tests, 100% coverage)
-      - ✅ All 65 tests passing (6 test suites)
-      - ✅ Test coverage improved: 78.63% overall (was 77.37%)
-      - ✅ Tool properly integrated with server-factory
-      - 📋 MCP server now has complete CRUD capability for tasks
-      - 📋 Agents can create tasks, milestones, task items, and track progress
+      - ✅ Identified missing task_create tool during @acp.init
+      - ✅ Implemented task_create_task (v1.1.0)
+      - ✅ Added task_update_task and task_delete_task (v1.2.0)
+      - ✅ Complete API redesign for consistency (v2.0.0)
+      - ✅ Removed 4 redundant tools (task_get_status, task_get_next_step, task_complete_task_item, task_report_completion)
+      - ✅ Added 7 new tools (task_get_tasks, task_get_task, task_get_milestone, task_get_task_item, task_update_milestone, task_update_task_item, plus delete stubs)
+      - ✅ Created templates.ts with full ACP document templates
+      - ✅ Embedded templates in tool descriptions for agent guidance
+      - ✅ Consistent naming: task_<verb>_<entity> pattern
+      - ✅ Complete CRUD for Task entity (create, get, get_all, update, delete)
+      - ✅ Complete CRU for Milestone and TaskItem (no delete - requires task-core enhancement)
+      - ✅ Migrated to task-core v1.0.3 schema (full ACP progress.yaml structure)
+      - ✅ Updated all tests for new schema (machine_id, working_directory, nested progress)
+      - ✅ 52 tests passing, build successful
+      - ✅ 13 tools total (was 9): 5 Task CRUD, 3 Milestone CRU, 3 TaskItem CRU, 2 Progress/Communication
+      - 📋 API is now consistent, complete, and production-ready
+      - 📋 Ready for npm publish v2.0.0
   
   - date: 2026-02-19
     description: |
